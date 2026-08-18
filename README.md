@@ -1,4 +1,4 @@
-<!-- Banner placeholder — replace with your custom banner image -->
+<!-- Banner placeholder: replace with your custom banner image -->
 <!-- <p align="center">
   <img src="assets/banner.png" alt="Late Delivery Risk Prediction" width="900" />
 </p> -->
@@ -6,7 +6,7 @@
 <h1 align="center">Late Delivery Risk Prediction</h1>
 
 <p align="center">
-  <strong>Predict which orders will arrive late — before they ship.</strong>
+  <strong>Predict which orders will arrive late, before they ship.</strong>
 </p>
 
 <p align="center">
@@ -62,17 +62,17 @@ Headline split is **temporal** (train on past orders, test on future). Random sp
 
 **Primary metric:** F1 score (accuracy is misleading with 55/45 class split). Every number traces to [`reports/model_comparison.json`](reports/model_comparison.json).
 
-## So What — The Business Read
+## So What: The Business Read
 
 The honest finding: XGBoost adds no meaningful lift over logistic regression (F1 **0.6648** vs 0.6531 on the temporal split). After leakage removal, late delivery is near-deterministic from shipping mode alone (First Class 95.3% late, Second Class 76.7%), and SHAP confirms the model re-learns that lookup table. Customer-history features added zero lift.
 
 That is a valid business conclusion, not a failed project. The **recommended** production design is a shipping-mode rule for the high-risk tiers, plus a model only on the ambiguous Standard Class tier where lateness is genuinely uncertain.
 
-- [Limitations & Decisions](docs/LIMITATIONS_AND_DECISIONS.md) — why the rule beats the model, calibration (Brier 0.2028; isotonic adapter exists but is not wired into serving), and the ops threshold (0.35).
-- [Business Impact (illustrative)](docs/BUSINESS_IMPACT.md) — net-value formula with labeled assumptions. No invented ROI.
-- [Frozen metrics](reports/model_comparison.json) — source of truth for the table above.
+- [Limitations & Decisions](docs/LIMITATIONS_AND_DECISIONS.md): why the rule beats the model, calibration (Brier 0.2028; isotonic adapter exists but is not wired into serving), and the ops threshold (0.35).
+- [Business Impact (illustrative)](docs/BUSINESS_IMPACT.md): net-value formula with labeled assumptions. No invented ROI.
+- [Frozen metrics](reports/model_comparison.json): source of truth for the table above.
 
-> Interview line: "I shipped a leakage-safe classifier with full MLOps scaffolding, then used SHAP to show a 4-row rule already captures most of the signal — so I recommended the simpler tool. The deliverable was the decision, not the model."
+> Interview line: "I shipped a leakage-safe classifier with full MLOps scaffolding, then used SHAP to show a 4-row rule already captures most of the signal, so I recommended the simpler tool. The deliverable was the decision, not the model."
 
 ## Project Journey
 
@@ -91,9 +91,9 @@ flowchart LR
     D --> SHIP[Shipped<br/>Streamlit dashboard plus<br/>limitations and impact docs]
 ```
 
-## Recommended Decision Logic (design — not what the demo ships)
+## Recommended Decision Logic (design, not what the demo ships)
 
-The **recommended** production design below is the interview takeaway from SHAP + EDA. The Streamlit demo today scores **every** shipping mode with the uncalibrated model at threshold **0.35** (an ops compromise — see [Limitations](docs/LIMITATIONS_AND_DECISIONS.md)).
+The **recommended** production design below is the interview takeaway from SHAP + EDA. The Streamlit demo today scores **every** shipping mode with the uncalibrated model at threshold **0.35** (an ops compromise; see [Limitations](docs/LIMITATIONS_AND_DECISIONS.md)).
 
 ```mermaid
 flowchart TD
@@ -117,11 +117,11 @@ SHAP (SHapley Additive exPlanations) provides both global and local explanations
 - **Local:** Why a specific order was flagged as high-risk
 
 Top features by mean |SHAP value| (XGBoost default):
-1. `shipping_mode_Standard Class` — 0.6160
-2. `shipping_mode_First Class` — 0.4318
-3. `shipping_mode_Second Class` — 0.1344
-4. `shipping_mode_Same Day` — 0.0748
-5. `sales_per_customer` — 0.0541
+1. `shipping_mode_Standard Class`: 0.6160
+2. `shipping_mode_First Class`: 0.4318
+3. `shipping_mode_Second Class`: 0.1344
+4. `shipping_mode_Same Day`: 0.0748
+5. `sales_per_customer`: 0.0541
 
 ## Experiment Tracking
 
@@ -167,7 +167,7 @@ flowchart LR
     EVAL --> DASH
 ```
 
-**Architecture:** Hexagonal (ports & adapters) — business rules in `domain/` have zero external imports. ML frameworks, data sources, and UI are swappable adapters.
+**Architecture:** Hexagonal (ports & adapters); business rules in `domain/` have zero external imports. ML frameworks, data sources, and UI are swappable adapters.
 
 **Why this matters:** Swap XGBoost for LightGBM? Write one adapter file. Data from a database instead of CSV? One adapter. Domain logic and tests don't change.
 
@@ -217,8 +217,8 @@ Three columns are **never** used as features (enforced by `LEAKAGE_COLUMNS` in `
 
 | Column | Why It Leaks |
 |--------|-------------|
-| `Days for shipping (real)` | Only known after delivery — reveals the outcome |
-| `Delivery Status` | Directly encodes late/on-time — IS the outcome |
+| `Days for shipping (real)` | Only known after delivery; reveals the outcome |
+| `Delivery Status` | Directly encodes late/on-time; IS the outcome |
 | `shipping date (DateOrders)` | Future information unavailable at prediction time |
 
 The encoder is **fit on training data only** (split-before-encode pattern) to prevent preprocessing leakage.
@@ -261,10 +261,10 @@ make app
 # Opens at http://localhost:8501
 ```
 
-- Risk Predictor — Enter order details, get live risk score plus SHAP waterfall
-- Model Results — Side-by-side LogReg vs XGBoost metrics plus SHAP importance
-- Customer Segments — K-Means cluster profiles plus PCA scatter
-- Data Explorer — Key statistics, shipping mode, and region distributions
+- Risk Predictor: Enter order details, get live risk score plus SHAP waterfall
+- Model Results: Side-by-side LogReg vs XGBoost metrics plus SHAP importance
+- Customer Segments: K-Means cluster profiles plus PCA scatter
+- Data Explorer: Key statistics, shipping mode, and region distributions
 
 Sidebar toggle switches between **Full Dataset (180K)** and **Sample (1K)** statistics. Risk Predictor uses sample-trained model for live interactivity.
 
@@ -289,10 +289,10 @@ The image runs as a non-root user and exposes Streamlit's `/_stcore/health` endp
 ## Quality
 
 - **156 tests** at 93% coverage (90% gate enforced in CI)
-- **mypy strict** — full type safety across domain, adapters, application
-- **Pre-commit hooks** — black, isort, ruff, mypy, gitleaks
-- **Property-based testing** — Hypothesis for domain invariants
-- **CI/CD** — GitHub Actions: test suite, linting, mypy strict, secret scanning
+- **mypy strict**: full type safety across domain, adapters, application
+- **Pre-commit hooks**: black, isort, ruff, mypy, gitleaks
+- **Property-based testing**: Hypothesis for domain invariants
+- **CI/CD**: GitHub Actions: test suite, linting, mypy strict, secret scanning
 
 ## Tech Stack
 
@@ -309,7 +309,7 @@ The image runs as a non-root user and exposes Streamlit's `/_stcore/health` endp
 
 ## Dataset
 
-[DataCo SMART Supply Chain](https://www.kaggle.com/datasets/shashwatwork/dataco-smart-supply-chain-for-big-data-analysis) — 180,519 orders across multiple product categories, shipping modes, and customer segments.
+[DataCo SMART Supply Chain](https://www.kaggle.com/datasets/shashwatwork/dataco-smart-supply-chain-for-big-data-analysis): 180,519 orders across multiple product categories, shipping modes, and customer segments.
 
 ## License
 

@@ -1,0 +1,707 @@
+month,year,market,shipping_mode,customer_segment,orders,late_orders
+2015-01,2015,LATAM,First Class,Consumer,130,125
+2015-01,2015,LATAM,First Class,Corporate,58,56
+2015-01,2015,LATAM,First Class,Home Office,48,46
+2015-01,2015,LATAM,Same Day,Consumer,51,26
+2015-01,2015,LATAM,Same Day,Corporate,21,5
+2015-01,2015,LATAM,Same Day,Home Office,13,6
+2015-01,2015,LATAM,Second Class,Consumer,177,134
+2015-01,2015,LATAM,Second Class,Corporate,111,83
+2015-01,2015,LATAM,Second Class,Home Office,67,55
+2015-01,2015,LATAM,Standard Class,Consumer,570,226
+2015-01,2015,LATAM,Standard Class,Corporate,338,131
+2015-01,2015,LATAM,Standard Class,Home Office,203,70
+2015-02,2015,LATAM,First Class,Consumer,125,119
+2015-02,2015,LATAM,First Class,Corporate,75,71
+2015-02,2015,LATAM,First Class,Home Office,39,37
+2015-02,2015,LATAM,Same Day,Consumer,47,26
+2015-02,2015,LATAM,Same Day,Corporate,29,13
+2015-02,2015,LATAM,Same Day,Home Office,17,10
+2015-02,2015,LATAM,Second Class,Consumer,163,122
+2015-02,2015,LATAM,Second Class,Corporate,91,69
+2015-02,2015,LATAM,Second Class,Home Office,67,52
+2015-02,2015,LATAM,Standard Class,Consumer,480,185
+2015-02,2015,LATAM,Standard Class,Corporate,280,108
+2015-02,2015,LATAM,Standard Class,Home Office,172,59
+2015-03,2015,LATAM,First Class,Consumer,153,151
+2015-03,2015,LATAM,First Class,Corporate,83,79
+2015-03,2015,LATAM,First Class,Home Office,53,51
+2015-03,2015,LATAM,Same Day,Consumer,60,25
+2015-03,2015,LATAM,Same Day,Corporate,29,15
+2015-03,2015,LATAM,Same Day,Home Office,17,4
+2015-03,2015,LATAM,Second Class,Consumer,192,142
+2015-03,2015,LATAM,Second Class,Corporate,89,72
+2015-03,2015,LATAM,Second Class,Home Office,63,49
+2015-03,2015,LATAM,Standard Class,Consumer,541,206
+2015-03,2015,LATAM,Standard Class,Corporate,323,120
+2015-03,2015,LATAM,Standard Class,Home Office,178,64
+2015-04,2015,LATAM,First Class,Consumer,137,133
+2015-04,2015,LATAM,First Class,Corporate,63,58
+2015-04,2015,LATAM,First Class,Home Office,31,29
+2015-04,2015,LATAM,Same Day,Consumer,38,20
+2015-04,2015,LATAM,Same Day,Corporate,17,8
+2015-04,2015,LATAM,Same Day,Home Office,26,14
+2015-04,2015,LATAM,Second Class,Consumer,170,127
+2015-04,2015,LATAM,Second Class,Corporate,116,89
+2015-04,2015,LATAM,Second Class,Home Office,57,42
+2015-04,2015,LATAM,Standard Class,Consumer,562,215
+2015-04,2015,LATAM,Standard Class,Corporate,304,120
+2015-04,2015,LATAM,Standard Class,Home Office,189,72
+2015-05,2015,Europe,First Class,Consumer,2,2
+2015-05,2015,Europe,First Class,Corporate,4,4
+2015-05,2015,Europe,Same Day,Corporate,1,1
+2015-05,2015,Europe,Second Class,Consumer,7,5
+2015-05,2015,Europe,Second Class,Corporate,4,3
+2015-05,2015,Europe,Second Class,Home Office,1,1
+2015-05,2015,Europe,Standard Class,Consumer,14,7
+2015-05,2015,Europe,Standard Class,Corporate,4,1
+2015-05,2015,Europe,Standard Class,Home Office,4,1
+2015-05,2015,LATAM,First Class,Consumer,146,131
+2015-05,2015,LATAM,First Class,Corporate,104,96
+2015-05,2015,LATAM,First Class,Home Office,55,50
+2015-05,2015,LATAM,Same Day,Consumer,47,27
+2015-05,2015,LATAM,Same Day,Corporate,24,14
+2015-05,2015,LATAM,Same Day,Home Office,18,10
+2015-05,2015,LATAM,Second Class,Consumer,166,122
+2015-05,2015,LATAM,Second Class,Corporate,93,74
+2015-05,2015,LATAM,Second Class,Home Office,50,40
+2015-05,2015,LATAM,Standard Class,Consumer,525,203
+2015-05,2015,LATAM,Standard Class,Corporate,316,118
+2015-05,2015,LATAM,Standard Class,Home Office,191,59
+2015-06,2015,Europe,First Class,Consumer,141,135
+2015-06,2015,Europe,First Class,Corporate,53,50
+2015-06,2015,Europe,First Class,Home Office,46,45
+2015-06,2015,Europe,Same Day,Consumer,38,16
+2015-06,2015,Europe,Same Day,Corporate,34,14
+2015-06,2015,Europe,Same Day,Home Office,13,6
+2015-06,2015,Europe,Second Class,Consumer,180,129
+2015-06,2015,Europe,Second Class,Corporate,104,85
+2015-06,2015,Europe,Second Class,Home Office,56,38
+2015-06,2015,Europe,Standard Class,Consumer,531,226
+2015-06,2015,Europe,Standard Class,Corporate,331,118
+2015-06,2015,Europe,Standard Class,Home Office,198,79
+2015-07,2015,Europe,First Class,Consumer,133,128
+2015-07,2015,Europe,First Class,Corporate,75,75
+2015-07,2015,Europe,First Class,Home Office,53,52
+2015-07,2015,Europe,Same Day,Consumer,61,19
+2015-07,2015,Europe,Same Day,Corporate,36,19
+2015-07,2015,Europe,Same Day,Home Office,21,4
+2015-07,2015,Europe,Second Class,Consumer,168,131
+2015-07,2015,Europe,Second Class,Corporate,106,91
+2015-07,2015,Europe,Second Class,Home Office,63,47
+2015-07,2015,Europe,Standard Class,Consumer,537,201
+2015-07,2015,Europe,Standard Class,Corporate,334,129
+2015-07,2015,Europe,Standard Class,Home Office,176,67
+2015-08,2015,Europe,First Class,Consumer,144,139
+2015-08,2015,Europe,First Class,Corporate,99,97
+2015-08,2015,Europe,First Class,Home Office,45,45
+2015-08,2015,Europe,Same Day,Consumer,45,19
+2015-08,2015,Europe,Same Day,Corporate,23,10
+2015-08,2015,Europe,Same Day,Home Office,19,8
+2015-08,2015,Europe,Second Class,Consumer,183,138
+2015-08,2015,Europe,Second Class,Corporate,116,93
+2015-08,2015,Europe,Second Class,Home Office,66,50
+2015-08,2015,Europe,Standard Class,Consumer,521,180
+2015-08,2015,Europe,Standard Class,Corporate,313,116
+2015-08,2015,Europe,Standard Class,Home Office,188,71
+2015-09,2015,Europe,First Class,Consumer,126,124
+2015-09,2015,Europe,First Class,Corporate,78,77
+2015-09,2015,Europe,First Class,Home Office,49,48
+2015-09,2015,Europe,Same Day,Consumer,48,16
+2015-09,2015,Europe,Same Day,Corporate,20,5
+2015-09,2015,Europe,Same Day,Home Office,12,7
+2015-09,2015,Europe,Second Class,Consumer,168,136
+2015-09,2015,Europe,Second Class,Corporate,101,80
+2015-09,2015,Europe,Second Class,Home Office,58,40
+2015-09,2015,Europe,Standard Class,Consumer,559,238
+2015-09,2015,Europe,Standard Class,Corporate,307,108
+2015-09,2015,Europe,Standard Class,Home Office,180,72
+2015-10,2015,Europe,First Class,Consumer,120,110
+2015-10,2015,Europe,First Class,Corporate,75,72
+2015-10,2015,Europe,First Class,Home Office,44,43
+2015-10,2015,Europe,Same Day,Consumer,49,32
+2015-10,2015,Europe,Same Day,Corporate,12,4
+2015-10,2015,Europe,Same Day,Home Office,8,2
+2015-10,2015,Europe,Second Class,Consumer,117,85
+2015-10,2015,Europe,Second Class,Corporate,65,52
+2015-10,2015,Europe,Second Class,Home Office,50,41
+2015-10,2015,Europe,Standard Class,Consumer,379,141
+2015-10,2015,Europe,Standard Class,Corporate,259,89
+2015-10,2015,Europe,Standard Class,Home Office,140,57
+2015-10,2015,Pacific Asia,First Class,Consumer,30,27
+2015-10,2015,Pacific Asia,First Class,Corporate,20,20
+2015-10,2015,Pacific Asia,First Class,Home Office,13,12
+2015-10,2015,Pacific Asia,Same Day,Consumer,12,7
+2015-10,2015,Pacific Asia,Same Day,Corporate,8,5
+2015-10,2015,Pacific Asia,Same Day,Home Office,3,3
+2015-10,2015,Pacific Asia,Second Class,Consumer,35,24
+2015-10,2015,Pacific Asia,Second Class,Corporate,29,23
+2015-10,2015,Pacific Asia,Second Class,Home Office,21,17
+2015-10,2015,Pacific Asia,Standard Class,Consumer,151,65
+2015-10,2015,Pacific Asia,Standard Class,Corporate,82,25
+2015-10,2015,Pacific Asia,Standard Class,Home Office,53,17
+2015-11,2015,Pacific Asia,First Class,Consumer,135,131
+2015-11,2015,Pacific Asia,First Class,Corporate,74,72
+2015-11,2015,Pacific Asia,First Class,Home Office,42,40
+2015-11,2015,Pacific Asia,Same Day,Consumer,49,21
+2015-11,2015,Pacific Asia,Same Day,Corporate,33,16
+2015-11,2015,Pacific Asia,Same Day,Home Office,9,1
+2015-11,2015,Pacific Asia,Second Class,Consumer,173,137
+2015-11,2015,Pacific Asia,Second Class,Corporate,106,76
+2015-11,2015,Pacific Asia,Second Class,Home Office,65,50
+2015-11,2015,Pacific Asia,Standard Class,Consumer,545,211
+2015-11,2015,Pacific Asia,Standard Class,Corporate,305,115
+2015-11,2015,Pacific Asia,Standard Class,Home Office,193,71
+2015-12,2015,Pacific Asia,First Class,Consumer,152,142
+2015-12,2015,Pacific Asia,First Class,Corporate,86,82
+2015-12,2015,Pacific Asia,First Class,Home Office,42,41
+2015-12,2015,Pacific Asia,Same Day,Consumer,55,22
+2015-12,2015,Pacific Asia,Same Day,Corporate,41,17
+2015-12,2015,Pacific Asia,Same Day,Home Office,18,4
+2015-12,2015,Pacific Asia,Second Class,Consumer,178,135
+2015-12,2015,Pacific Asia,Second Class,Corporate,112,93
+2015-12,2015,Pacific Asia,Second Class,Home Office,64,49
+2015-12,2015,Pacific Asia,Standard Class,Consumer,534,210
+2015-12,2015,Pacific Asia,Standard Class,Corporate,329,126
+2015-12,2015,Pacific Asia,Standard Class,Home Office,194,67
+2016-01,2016,Pacific Asia,First Class,Consumer,137,128
+2016-01,2016,Pacific Asia,First Class,Corporate,82,81
+2016-01,2016,Pacific Asia,First Class,Home Office,47,43
+2016-01,2016,Pacific Asia,Same Day,Consumer,54,28
+2016-01,2016,Pacific Asia,Same Day,Corporate,37,14
+2016-01,2016,Pacific Asia,Same Day,Home Office,12,6
+2016-01,2016,Pacific Asia,Second Class,Consumer,183,135
+2016-01,2016,Pacific Asia,Second Class,Corporate,125,105
+2016-01,2016,Pacific Asia,Second Class,Home Office,54,40
+2016-01,2016,Pacific Asia,Standard Class,Consumer,530,210
+2016-01,2016,Pacific Asia,Standard Class,Corporate,312,129
+2016-01,2016,Pacific Asia,Standard Class,Home Office,199,79
+2016-02,2016,Pacific Asia,First Class,Consumer,116,111
+2016-02,2016,Pacific Asia,First Class,Corporate,77,69
+2016-02,2016,Pacific Asia,First Class,Home Office,39,36
+2016-02,2016,Pacific Asia,Same Day,Consumer,44,16
+2016-02,2016,Pacific Asia,Same Day,Corporate,27,8
+2016-02,2016,Pacific Asia,Same Day,Home Office,11,2
+2016-02,2016,Pacific Asia,Second Class,Consumer,173,130
+2016-02,2016,Pacific Asia,Second Class,Corporate,77,60
+2016-02,2016,Pacific Asia,Second Class,Home Office,59,43
+2016-02,2016,Pacific Asia,Standard Class,Consumer,538,220
+2016-02,2016,Pacific Asia,Standard Class,Corporate,307,128
+2016-02,2016,Pacific Asia,Standard Class,Home Office,182,70
+2016-03,2016,Pacific Asia,First Class,Consumer,155,147
+2016-03,2016,Pacific Asia,First Class,Corporate,80,78
+2016-03,2016,Pacific Asia,First Class,Home Office,55,53
+2016-03,2016,Pacific Asia,Same Day,Consumer,47,26
+2016-03,2016,Pacific Asia,Same Day,Corporate,24,11
+2016-03,2016,Pacific Asia,Same Day,Home Office,19,9
+2016-03,2016,Pacific Asia,Second Class,Consumer,164,127
+2016-03,2016,Pacific Asia,Second Class,Corporate,106,79
+2016-03,2016,Pacific Asia,Second Class,Home Office,67,56
+2016-03,2016,Pacific Asia,Standard Class,Consumer,549,204
+2016-03,2016,Pacific Asia,Standard Class,Corporate,309,117
+2016-03,2016,Pacific Asia,Standard Class,Home Office,189,80
+2016-04,2016,Pacific Asia,First Class,Consumer,2,1
+2016-04,2016,Pacific Asia,First Class,Corporate,4,4
+2016-04,2016,Pacific Asia,First Class,Home Office,2,1
+2016-04,2016,Pacific Asia,Same Day,Consumer,2,1
+2016-04,2016,Pacific Asia,Second Class,Consumer,11,8
+2016-04,2016,Pacific Asia,Second Class,Corporate,3,3
+2016-04,2016,Pacific Asia,Second Class,Home Office,5,4
+2016-04,2016,Pacific Asia,Standard Class,Consumer,9,2
+2016-04,2016,Pacific Asia,Standard Class,Corporate,7,2
+2016-04,2016,Pacific Asia,Standard Class,Home Office,5,3
+2016-04,2016,USCA,First Class,Consumer,134,130
+2016-04,2016,USCA,First Class,Corporate,78,73
+2016-04,2016,USCA,First Class,Home Office,40,39
+2016-04,2016,USCA,Same Day,Consumer,48,19
+2016-04,2016,USCA,Same Day,Corporate,21,9
+2016-04,2016,USCA,Same Day,Home Office,12,8
+2016-04,2016,USCA,Second Class,Consumer,163,128
+2016-04,2016,USCA,Second Class,Corporate,100,75
+2016-04,2016,USCA,Second Class,Home Office,57,47
+2016-04,2016,USCA,Standard Class,Consumer,518,185
+2016-04,2016,USCA,Standard Class,Corporate,339,129
+2016-04,2016,USCA,Standard Class,Home Office,146,54
+2016-05,2016,USCA,First Class,Consumer,140,133
+2016-05,2016,USCA,First Class,Corporate,86,80
+2016-05,2016,USCA,First Class,Home Office,50,48
+2016-05,2016,USCA,Same Day,Consumer,49,19
+2016-05,2016,USCA,Same Day,Corporate,39,12
+2016-05,2016,USCA,Same Day,Home Office,16,6
+2016-05,2016,USCA,Second Class,Consumer,204,162
+2016-05,2016,USCA,Second Class,Corporate,93,71
+2016-05,2016,USCA,Second Class,Home Office,51,43
+2016-05,2016,USCA,Standard Class,Consumer,549,208
+2016-05,2016,USCA,Standard Class,Corporate,309,111
+2016-05,2016,USCA,Standard Class,Home Office,177,78
+2016-06,2016,USCA,First Class,Consumer,133,129
+2016-06,2016,USCA,First Class,Corporate,81,79
+2016-06,2016,USCA,First Class,Home Office,34,33
+2016-06,2016,USCA,Same Day,Consumer,47,25
+2016-06,2016,USCA,Same Day,Corporate,29,14
+2016-06,2016,USCA,Same Day,Home Office,13,8
+2016-06,2016,USCA,Second Class,Consumer,198,155
+2016-06,2016,USCA,Second Class,Corporate,112,90
+2016-06,2016,USCA,Second Class,Home Office,54,36
+2016-06,2016,USCA,Standard Class,Consumer,509,200
+2016-06,2016,USCA,Standard Class,Corporate,291,122
+2016-06,2016,USCA,Standard Class,Home Office,189,77
+2016-07,2016,USCA,First Class,Consumer,152,144
+2016-07,2016,USCA,First Class,Corporate,76,69
+2016-07,2016,USCA,First Class,Home Office,56,51
+2016-07,2016,USCA,Same Day,Consumer,53,21
+2016-07,2016,USCA,Same Day,Corporate,33,11
+2016-07,2016,USCA,Same Day,Home Office,17,5
+2016-07,2016,USCA,Second Class,Consumer,168,121
+2016-07,2016,USCA,Second Class,Corporate,88,70
+2016-07,2016,USCA,Second Class,Home Office,53,39
+2016-07,2016,USCA,Standard Class,Consumer,544,196
+2016-07,2016,USCA,Standard Class,Corporate,307,114
+2016-07,2016,USCA,Standard Class,Home Office,211,81
+2016-08,2016,Africa,First Class,Consumer,6,6
+2016-08,2016,Africa,First Class,Corporate,7,7
+2016-08,2016,Africa,First Class,Home Office,1,1
+2016-08,2016,Africa,Same Day,Consumer,4,2
+2016-08,2016,Africa,Same Day,Corporate,1,1
+2016-08,2016,Africa,Second Class,Consumer,14,11
+2016-08,2016,Africa,Second Class,Corporate,14,10
+2016-08,2016,Africa,Second Class,Home Office,6,6
+2016-08,2016,Africa,Standard Class,Consumer,64,28
+2016-08,2016,Africa,Standard Class,Corporate,32,12
+2016-08,2016,Africa,Standard Class,Home Office,16,4
+2016-08,2016,Europe,First Class,Consumer,4,4
+2016-08,2016,Europe,First Class,Corporate,1,1
+2016-08,2016,Europe,First Class,Home Office,2,2
+2016-08,2016,Europe,Second Class,Consumer,4,4
+2016-08,2016,Europe,Second Class,Corporate,3,1
+2016-08,2016,Europe,Second Class,Home Office,1,1
+2016-08,2016,Europe,Standard Class,Consumer,16,4
+2016-08,2016,Europe,Standard Class,Corporate,8,1
+2016-08,2016,Europe,Standard Class,Home Office,1,0
+2016-08,2016,Pacific Asia,First Class,Consumer,11,11
+2016-08,2016,Pacific Asia,First Class,Corporate,5,5
+2016-08,2016,Pacific Asia,First Class,Home Office,9,9
+2016-08,2016,Pacific Asia,Same Day,Consumer,2,2
+2016-08,2016,Pacific Asia,Same Day,Corporate,1,0
+2016-08,2016,Pacific Asia,Same Day,Home Office,1,1
+2016-08,2016,Pacific Asia,Second Class,Consumer,17,13
+2016-08,2016,Pacific Asia,Second Class,Corporate,8,6
+2016-08,2016,Pacific Asia,Second Class,Home Office,2,2
+2016-08,2016,Pacific Asia,Standard Class,Consumer,47,17
+2016-08,2016,Pacific Asia,Standard Class,Corporate,24,8
+2016-08,2016,Pacific Asia,Standard Class,Home Office,17,6
+2016-08,2016,USCA,First Class,Consumer,114,111
+2016-08,2016,USCA,First Class,Corporate,65,60
+2016-08,2016,USCA,First Class,Home Office,45,42
+2016-08,2016,USCA,Same Day,Consumer,47,25
+2016-08,2016,USCA,Same Day,Corporate,18,11
+2016-08,2016,USCA,Same Day,Home Office,12,8
+2016-08,2016,USCA,Second Class,Consumer,145,112
+2016-08,2016,USCA,Second Class,Corporate,87,65
+2016-08,2016,USCA,Second Class,Home Office,50,36
+2016-08,2016,USCA,Standard Class,Consumer,451,172
+2016-08,2016,USCA,Standard Class,Corporate,229,96
+2016-08,2016,USCA,Standard Class,Home Office,154,59
+2016-09,2016,Africa,First Class,Consumer,82,78
+2016-09,2016,Africa,First Class,Corporate,25,23
+2016-09,2016,Africa,First Class,Home Office,20,20
+2016-09,2016,Africa,Same Day,Consumer,30,10
+2016-09,2016,Africa,Same Day,Corporate,15,8
+2016-09,2016,Africa,Same Day,Home Office,10,8
+2016-09,2016,Africa,Second Class,Consumer,86,60
+2016-09,2016,Africa,Second Class,Corporate,55,44
+2016-09,2016,Africa,Second Class,Home Office,22,17
+2016-09,2016,Africa,Standard Class,Consumer,271,99
+2016-09,2016,Africa,Standard Class,Corporate,152,55
+2016-09,2016,Africa,Standard Class,Home Office,101,38
+2016-09,2016,Europe,First Class,Consumer,29,27
+2016-09,2016,Europe,First Class,Corporate,16,14
+2016-09,2016,Europe,First Class,Home Office,13,13
+2016-09,2016,Europe,Same Day,Consumer,10,2
+2016-09,2016,Europe,Same Day,Corporate,6,1
+2016-09,2016,Europe,Same Day,Home Office,2,0
+2016-09,2016,Europe,Second Class,Consumer,23,20
+2016-09,2016,Europe,Second Class,Corporate,16,12
+2016-09,2016,Europe,Second Class,Home Office,9,7
+2016-09,2016,Europe,Standard Class,Consumer,86,39
+2016-09,2016,Europe,Standard Class,Corporate,43,24
+2016-09,2016,Europe,Standard Class,Home Office,33,14
+2016-09,2016,Pacific Asia,First Class,Consumer,40,38
+2016-09,2016,Pacific Asia,First Class,Corporate,22,22
+2016-09,2016,Pacific Asia,First Class,Home Office,12,12
+2016-09,2016,Pacific Asia,Same Day,Consumer,10,3
+2016-09,2016,Pacific Asia,Same Day,Corporate,10,7
+2016-09,2016,Pacific Asia,Same Day,Home Office,2,0
+2016-09,2016,Pacific Asia,Second Class,Consumer,46,40
+2016-09,2016,Pacific Asia,Second Class,Corporate,45,32
+2016-09,2016,Pacific Asia,Second Class,Home Office,13,9
+2016-09,2016,Pacific Asia,Standard Class,Consumer,164,64
+2016-09,2016,Pacific Asia,Standard Class,Corporate,98,35
+2016-09,2016,Pacific Asia,Standard Class,Home Office,55,19
+2016-09,2016,USCA,First Class,Consumer,8,8
+2016-09,2016,USCA,First Class,Corporate,7,6
+2016-09,2016,USCA,First Class,Home Office,4,4
+2016-09,2016,USCA,Same Day,Consumer,2,0
+2016-09,2016,USCA,Second Class,Consumer,4,3
+2016-09,2016,USCA,Second Class,Home Office,4,2
+2016-09,2016,USCA,Standard Class,Consumer,11,5
+2016-09,2016,USCA,Standard Class,Corporate,12,4
+2016-09,2016,USCA,Standard Class,Home Office,6,3
+2016-10,2016,Africa,First Class,Consumer,54,53
+2016-10,2016,Africa,First Class,Corporate,39,39
+2016-10,2016,Africa,First Class,Home Office,17,17
+2016-10,2016,Africa,Same Day,Consumer,30,14
+2016-10,2016,Africa,Same Day,Corporate,21,16
+2016-10,2016,Africa,Same Day,Home Office,10,1
+2016-10,2016,Africa,Second Class,Consumer,68,47
+2016-10,2016,Africa,Second Class,Corporate,44,36
+2016-10,2016,Africa,Second Class,Home Office,28,18
+2016-10,2016,Africa,Standard Class,Consumer,247,89
+2016-10,2016,Africa,Standard Class,Corporate,145,49
+2016-10,2016,Africa,Standard Class,Home Office,81,34
+2016-10,2016,Europe,First Class,Consumer,32,32
+2016-10,2016,Europe,First Class,Corporate,13,12
+2016-10,2016,Europe,First Class,Home Office,8,8
+2016-10,2016,Europe,Same Day,Consumer,2,0
+2016-10,2016,Europe,Same Day,Corporate,8,5
+2016-10,2016,Europe,Second Class,Consumer,38,27
+2016-10,2016,Europe,Second Class,Corporate,9,6
+2016-10,2016,Europe,Second Class,Home Office,14,9
+2016-10,2016,Europe,Standard Class,Consumer,104,46
+2016-10,2016,Europe,Standard Class,Corporate,61,26
+2016-10,2016,Europe,Standard Class,Home Office,23,7
+2016-10,2016,Pacific Asia,First Class,Consumer,45,43
+2016-10,2016,Pacific Asia,First Class,Corporate,39,39
+2016-10,2016,Pacific Asia,First Class,Home Office,24,24
+2016-10,2016,Pacific Asia,Same Day,Consumer,22,5
+2016-10,2016,Pacific Asia,Same Day,Corporate,9,2
+2016-10,2016,Pacific Asia,Same Day,Home Office,6,2
+2016-10,2016,Pacific Asia,Second Class,Consumer,70,56
+2016-10,2016,Pacific Asia,Second Class,Corporate,48,36
+2016-10,2016,Pacific Asia,Second Class,Home Office,21,16
+2016-10,2016,Pacific Asia,Standard Class,Consumer,201,83
+2016-10,2016,Pacific Asia,Standard Class,Corporate,80,27
+2016-10,2016,Pacific Asia,Standard Class,Home Office,57,29
+2016-10,2016,USCA,First Class,Consumer,2,1
+2016-10,2016,USCA,First Class,Corporate,4,4
+2016-10,2016,USCA,First Class,Home Office,2,2
+2016-10,2016,USCA,Same Day,Consumer,2,1
+2016-10,2016,USCA,Second Class,Consumer,9,3
+2016-10,2016,USCA,Second Class,Corporate,3,2
+2016-10,2016,USCA,Standard Class,Consumer,24,7
+2016-10,2016,USCA,Standard Class,Corporate,8,3
+2016-10,2016,USCA,Standard Class,Home Office,4,0
+2016-11,2016,Africa,First Class,Consumer,62,59
+2016-11,2016,Africa,First Class,Corporate,40,39
+2016-11,2016,Africa,First Class,Home Office,18,17
+2016-11,2016,Africa,Same Day,Consumer,21,9
+2016-11,2016,Africa,Same Day,Corporate,16,3
+2016-11,2016,Africa,Same Day,Home Office,10,3
+2016-11,2016,Africa,Second Class,Consumer,80,69
+2016-11,2016,Africa,Second Class,Corporate,47,38
+2016-11,2016,Africa,Second Class,Home Office,28,21
+2016-11,2016,Africa,Standard Class,Consumer,252,85
+2016-11,2016,Africa,Standard Class,Corporate,138,56
+2016-11,2016,Africa,Standard Class,Home Office,95,38
+2016-11,2016,Europe,First Class,Consumer,23,22
+2016-11,2016,Europe,First Class,Corporate,12,11
+2016-11,2016,Europe,First Class,Home Office,9,9
+2016-11,2016,Europe,Same Day,Consumer,8,1
+2016-11,2016,Europe,Same Day,Corporate,7,4
+2016-11,2016,Europe,Same Day,Home Office,2,1
+2016-11,2016,Europe,Second Class,Consumer,33,26
+2016-11,2016,Europe,Second Class,Corporate,26,19
+2016-11,2016,Europe,Second Class,Home Office,7,5
+2016-11,2016,Europe,Standard Class,Consumer,104,39
+2016-11,2016,Europe,Standard Class,Corporate,63,21
+2016-11,2016,Europe,Standard Class,Home Office,29,15
+2016-11,2016,Pacific Asia,First Class,Consumer,39,37
+2016-11,2016,Pacific Asia,First Class,Corporate,19,19
+2016-11,2016,Pacific Asia,First Class,Home Office,15,15
+2016-11,2016,Pacific Asia,Same Day,Consumer,10,8
+2016-11,2016,Pacific Asia,Same Day,Corporate,11,6
+2016-11,2016,Pacific Asia,Same Day,Home Office,5,2
+2016-11,2016,Pacific Asia,Second Class,Consumer,64,47
+2016-11,2016,Pacific Asia,Second Class,Corporate,26,20
+2016-11,2016,Pacific Asia,Second Class,Home Office,11,9
+2016-11,2016,Pacific Asia,Standard Class,Consumer,175,64
+2016-11,2016,Pacific Asia,Standard Class,Corporate,86,42
+2016-11,2016,Pacific Asia,Standard Class,Home Office,62,16
+2016-11,2016,USCA,First Class,Consumer,4,4
+2016-11,2016,USCA,First Class,Home Office,7,6
+2016-11,2016,USCA,Same Day,Consumer,2,0
+2016-11,2016,USCA,Second Class,Consumer,11,9
+2016-11,2016,USCA,Second Class,Corporate,7,7
+2016-11,2016,USCA,Second Class,Home Office,3,2
+2016-11,2016,USCA,Standard Class,Consumer,15,6
+2016-11,2016,USCA,Standard Class,Corporate,7,3
+2016-11,2016,USCA,Standard Class,Home Office,12,3
+2016-12,2016,Africa,First Class,Consumer,75,71
+2016-12,2016,Africa,First Class,Corporate,45,44
+2016-12,2016,Africa,First Class,Home Office,20,19
+2016-12,2016,Africa,Same Day,Consumer,25,13
+2016-12,2016,Africa,Same Day,Corporate,12,5
+2016-12,2016,Africa,Same Day,Home Office,6,4
+2016-12,2016,Africa,Second Class,Consumer,81,65
+2016-12,2016,Africa,Second Class,Corporate,39,29
+2016-12,2016,Africa,Second Class,Home Office,24,22
+2016-12,2016,Africa,Standard Class,Consumer,257,114
+2016-12,2016,Africa,Standard Class,Corporate,153,60
+2016-12,2016,Africa,Standard Class,Home Office,83,36
+2016-12,2016,Europe,First Class,Consumer,29,27
+2016-12,2016,Europe,First Class,Corporate,13,11
+2016-12,2016,Europe,First Class,Home Office,14,13
+2016-12,2016,Europe,Same Day,Consumer,12,6
+2016-12,2016,Europe,Same Day,Corporate,2,0
+2016-12,2016,Europe,Same Day,Home Office,4,2
+2016-12,2016,Europe,Second Class,Consumer,34,25
+2016-12,2016,Europe,Second Class,Corporate,19,18
+2016-12,2016,Europe,Second Class,Home Office,10,7
+2016-12,2016,Europe,Standard Class,Consumer,98,34
+2016-12,2016,Europe,Standard Class,Corporate,51,16
+2016-12,2016,Europe,Standard Class,Home Office,27,6
+2016-12,2016,Pacific Asia,First Class,Consumer,43,40
+2016-12,2016,Pacific Asia,First Class,Corporate,34,34
+2016-12,2016,Pacific Asia,First Class,Home Office,22,20
+2016-12,2016,Pacific Asia,Same Day,Consumer,12,5
+2016-12,2016,Pacific Asia,Same Day,Corporate,8,2
+2016-12,2016,Pacific Asia,Same Day,Home Office,5,3
+2016-12,2016,Pacific Asia,Second Class,Consumer,48,35
+2016-12,2016,Pacific Asia,Second Class,Corporate,25,21
+2016-12,2016,Pacific Asia,Second Class,Home Office,27,22
+2016-12,2016,Pacific Asia,Standard Class,Consumer,183,68
+2016-12,2016,Pacific Asia,Standard Class,Corporate,94,34
+2016-12,2016,Pacific Asia,Standard Class,Home Office,59,25
+2016-12,2016,USCA,First Class,Consumer,9,9
+2016-12,2016,USCA,First Class,Corporate,3,3
+2016-12,2016,USCA,First Class,Home Office,3,3
+2016-12,2016,USCA,Same Day,Consumer,1,1
+2016-12,2016,USCA,Second Class,Corporate,4,4
+2016-12,2016,USCA,Standard Class,Consumer,19,2
+2016-12,2016,USCA,Standard Class,Corporate,19,6
+2016-12,2016,USCA,Standard Class,Home Office,12,6
+2017-01,2017,Africa,First Class,Consumer,24,23
+2017-01,2017,Africa,First Class,Corporate,16,15
+2017-01,2017,Africa,First Class,Home Office,6,5
+2017-01,2017,Africa,Same Day,Consumer,15,7
+2017-01,2017,Africa,Same Day,Corporate,7,1
+2017-01,2017,Africa,Same Day,Home Office,1,0
+2017-01,2017,Africa,Second Class,Consumer,37,27
+2017-01,2017,Africa,Second Class,Corporate,22,20
+2017-01,2017,Africa,Second Class,Home Office,20,11
+2017-01,2017,Africa,Standard Class,Consumer,124,47
+2017-01,2017,Africa,Standard Class,Corporate,82,31
+2017-01,2017,Africa,Standard Class,Home Office,55,19
+2017-01,2017,Europe,First Class,Consumer,15,15
+2017-01,2017,Europe,First Class,Corporate,6,6
+2017-01,2017,Europe,First Class,Home Office,7,7
+2017-01,2017,Europe,Same Day,Consumer,3,2
+2017-01,2017,Europe,Same Day,Corporate,3,3
+2017-01,2017,Europe,Same Day,Home Office,1,0
+2017-01,2017,Europe,Second Class,Consumer,15,10
+2017-01,2017,Europe,Second Class,Corporate,14,13
+2017-01,2017,Europe,Second Class,Home Office,11,9
+2017-01,2017,Europe,Standard Class,Consumer,60,29
+2017-01,2017,Europe,Standard Class,Corporate,27,7
+2017-01,2017,Europe,Standard Class,Home Office,26,9
+2017-01,2017,LATAM,First Class,Consumer,63,60
+2017-01,2017,LATAM,First Class,Corporate,27,27
+2017-01,2017,LATAM,First Class,Home Office,19,19
+2017-01,2017,LATAM,Same Day,Consumer,19,12
+2017-01,2017,LATAM,Same Day,Corporate,10,4
+2017-01,2017,LATAM,Same Day,Home Office,4,2
+2017-01,2017,LATAM,Second Class,Consumer,66,48
+2017-01,2017,LATAM,Second Class,Corporate,38,33
+2017-01,2017,LATAM,Second Class,Home Office,18,16
+2017-01,2017,LATAM,Standard Class,Consumer,269,97
+2017-01,2017,LATAM,Standard Class,Corporate,132,54
+2017-01,2017,LATAM,Standard Class,Home Office,78,31
+2017-01,2017,Pacific Asia,First Class,Consumer,23,21
+2017-01,2017,Pacific Asia,First Class,Corporate,18,16
+2017-01,2017,Pacific Asia,First Class,Home Office,7,7
+2017-01,2017,Pacific Asia,Same Day,Consumer,13,4
+2017-01,2017,Pacific Asia,Same Day,Corporate,4,2
+2017-01,2017,Pacific Asia,Same Day,Home Office,5,3
+2017-01,2017,Pacific Asia,Second Class,Consumer,40,36
+2017-01,2017,Pacific Asia,Second Class,Corporate,23,18
+2017-01,2017,Pacific Asia,Second Class,Home Office,13,9
+2017-01,2017,Pacific Asia,Standard Class,Consumer,120,49
+2017-01,2017,Pacific Asia,Standard Class,Corporate,71,28
+2017-01,2017,Pacific Asia,Standard Class,Home Office,27,10
+2017-01,2017,USCA,First Class,Corporate,1,1
+2017-01,2017,USCA,Same Day,Consumer,4,1
+2017-01,2017,USCA,Same Day,Corporate,1,0
+2017-01,2017,USCA,Second Class,Consumer,4,3
+2017-01,2017,USCA,Second Class,Corporate,3,2
+2017-01,2017,USCA,Second Class,Home Office,3,2
+2017-01,2017,USCA,Standard Class,Consumer,12,4
+2017-01,2017,USCA,Standard Class,Corporate,10,4
+2017-01,2017,USCA,Standard Class,Home Office,3,1
+2017-02,2017,LATAM,First Class,Consumer,117,106
+2017-02,2017,LATAM,First Class,Corporate,86,84
+2017-02,2017,LATAM,First Class,Home Office,44,43
+2017-02,2017,LATAM,Same Day,Consumer,53,24
+2017-02,2017,LATAM,Same Day,Corporate,33,17
+2017-02,2017,LATAM,Same Day,Home Office,14,8
+2017-02,2017,LATAM,Second Class,Consumer,155,115
+2017-02,2017,LATAM,Second Class,Corporate,99,72
+2017-02,2017,LATAM,Second Class,Home Office,63,50
+2017-02,2017,LATAM,Standard Class,Consumer,500,195
+2017-02,2017,LATAM,Standard Class,Corporate,283,98
+2017-02,2017,LATAM,Standard Class,Home Office,167,67
+2017-03,2017,LATAM,First Class,Consumer,147,140
+2017-03,2017,LATAM,First Class,Corporate,85,79
+2017-03,2017,LATAM,First Class,Home Office,67,63
+2017-03,2017,LATAM,Same Day,Consumer,43,22
+2017-03,2017,LATAM,Same Day,Corporate,33,21
+2017-03,2017,LATAM,Same Day,Home Office,24,14
+2017-03,2017,LATAM,Second Class,Consumer,153,120
+2017-03,2017,LATAM,Second Class,Corporate,116,84
+2017-03,2017,LATAM,Second Class,Home Office,65,52
+2017-03,2017,LATAM,Standard Class,Consumer,528,203
+2017-03,2017,LATAM,Standard Class,Corporate,339,114
+2017-03,2017,LATAM,Standard Class,Home Office,182,72
+2017-04,2017,LATAM,First Class,Consumer,119,115
+2017-04,2017,LATAM,First Class,Corporate,72,69
+2017-04,2017,LATAM,First Class,Home Office,55,51
+2017-04,2017,LATAM,Same Day,Consumer,51,19
+2017-04,2017,LATAM,Same Day,Corporate,18,3
+2017-04,2017,LATAM,Same Day,Home Office,14,6
+2017-04,2017,LATAM,Second Class,Consumer,188,145
+2017-04,2017,LATAM,Second Class,Corporate,97,77
+2017-04,2017,LATAM,Second Class,Home Office,61,40
+2017-04,2017,LATAM,Standard Class,Consumer,565,199
+2017-04,2017,LATAM,Standard Class,Corporate,306,116
+2017-04,2017,LATAM,Standard Class,Home Office,193,77
+2017-05,2017,LATAM,First Class,Consumer,162,150
+2017-05,2017,LATAM,First Class,Corporate,98,88
+2017-05,2017,LATAM,First Class,Home Office,50,48
+2017-05,2017,LATAM,Same Day,Consumer,50,24
+2017-05,2017,LATAM,Same Day,Corporate,33,17
+2017-05,2017,LATAM,Same Day,Home Office,14,6
+2017-05,2017,LATAM,Second Class,Consumer,160,120
+2017-05,2017,LATAM,Second Class,Corporate,103,73
+2017-05,2017,LATAM,Second Class,Home Office,61,49
+2017-05,2017,LATAM,Standard Class,Consumer,523,203
+2017-05,2017,LATAM,Standard Class,Corporate,327,113
+2017-05,2017,LATAM,Standard Class,Home Office,182,74
+2017-06,2017,Europe,First Class,Consumer,55,52
+2017-06,2017,Europe,First Class,Corporate,39,38
+2017-06,2017,Europe,First Class,Home Office,21,21
+2017-06,2017,Europe,Same Day,Consumer,20,11
+2017-06,2017,Europe,Same Day,Corporate,9,5
+2017-06,2017,Europe,Same Day,Home Office,7,4
+2017-06,2017,Europe,Second Class,Consumer,56,36
+2017-06,2017,Europe,Second Class,Corporate,36,26
+2017-06,2017,Europe,Second Class,Home Office,30,23
+2017-06,2017,Europe,Standard Class,Consumer,237,97
+2017-06,2017,Europe,Standard Class,Corporate,146,60
+2017-06,2017,Europe,Standard Class,Home Office,78,30
+2017-06,2017,LATAM,First Class,Consumer,59,57
+2017-06,2017,LATAM,First Class,Corporate,35,35
+2017-06,2017,LATAM,First Class,Home Office,33,32
+2017-06,2017,LATAM,Same Day,Consumer,20,9
+2017-06,2017,LATAM,Same Day,Corporate,16,6
+2017-06,2017,LATAM,Same Day,Home Office,10,5
+2017-06,2017,LATAM,Second Class,Consumer,110,80
+2017-06,2017,LATAM,Second Class,Corporate,57,43
+2017-06,2017,LATAM,Second Class,Home Office,25,21
+2017-06,2017,LATAM,Standard Class,Consumer,284,105
+2017-06,2017,LATAM,Standard Class,Corporate,177,66
+2017-06,2017,LATAM,Standard Class,Home Office,116,49
+2017-07,2017,Europe,First Class,Consumer,134,125
+2017-07,2017,Europe,First Class,Corporate,71,69
+2017-07,2017,Europe,First Class,Home Office,50,49
+2017-07,2017,Europe,Same Day,Consumer,64,37
+2017-07,2017,Europe,Same Day,Corporate,32,21
+2017-07,2017,Europe,Same Day,Home Office,24,11
+2017-07,2017,Europe,Second Class,Consumer,179,145
+2017-07,2017,Europe,Second Class,Corporate,118,90
+2017-07,2017,Europe,Second Class,Home Office,58,39
+2017-07,2017,Europe,Standard Class,Consumer,561,215
+2017-07,2017,Europe,Standard Class,Corporate,313,102
+2017-07,2017,Europe,Standard Class,Home Office,172,63
+2017-08,2017,Europe,First Class,Consumer,143,136
+2017-08,2017,Europe,First Class,Corporate,87,82
+2017-08,2017,Europe,First Class,Home Office,47,44
+2017-08,2017,Europe,Same Day,Consumer,52,22
+2017-08,2017,Europe,Same Day,Corporate,21,10
+2017-08,2017,Europe,Same Day,Home Office,17,7
+2017-08,2017,Europe,Second Class,Consumer,170,136
+2017-08,2017,Europe,Second Class,Corporate,121,92
+2017-08,2017,Europe,Second Class,Home Office,70,53
+2017-08,2017,Europe,Standard Class,Consumer,574,227
+2017-08,2017,Europe,Standard Class,Corporate,291,107
+2017-08,2017,Europe,Standard Class,Home Office,175,65
+2017-09,2017,Europe,First Class,Consumer,136,126
+2017-09,2017,Europe,First Class,Corporate,71,65
+2017-09,2017,Europe,First Class,Home Office,49,45
+2017-09,2017,Europe,Same Day,Consumer,48,30
+2017-09,2017,Europe,Same Day,Corporate,30,18
+2017-09,2017,Europe,Same Day,Home Office,16,7
+2017-09,2017,Europe,Second Class,Consumer,172,129
+2017-09,2017,Europe,Second Class,Corporate,105,85
+2017-09,2017,Europe,Second Class,Home Office,57,44
+2017-09,2017,Europe,Standard Class,Consumer,525,199
+2017-09,2017,Europe,Standard Class,Corporate,302,111
+2017-09,2017,Europe,Standard Class,Home Office,212,82
+2017-10,2017,Europe,First Class,Consumer,177,166
+2017-10,2017,Europe,First Class,Corporate,98,96
+2017-10,2017,Europe,First Class,Home Office,67,66
+2017-10,2017,Europe,Same Day,Consumer,59,31
+2017-10,2017,Europe,Same Day,Corporate,31,12
+2017-10,2017,Europe,Same Day,Home Office,20,6
+2017-10,2017,Europe,Second Class,Consumer,197,148
+2017-10,2017,Europe,Second Class,Corporate,114,85
+2017-10,2017,Europe,Second Class,Home Office,67,55
+2017-10,2017,Europe,Standard Class,Consumer,642,252
+2017-10,2017,Europe,Standard Class,Corporate,407,138
+2017-10,2017,Europe,Standard Class,Home Office,222,82
+2017-11,2017,Europe,First Class,Consumer,53,50
+2017-11,2017,Europe,First Class,Corporate,24,22
+2017-11,2017,Europe,First Class,Home Office,23,21
+2017-11,2017,Europe,Same Day,Consumer,26,10
+2017-11,2017,Europe,Same Day,Corporate,8,3
+2017-11,2017,Europe,Same Day,Home Office,5,3
+2017-11,2017,Europe,Second Class,Consumer,110,83
+2017-11,2017,Europe,Second Class,Corporate,32,24
+2017-11,2017,Europe,Second Class,Home Office,18,16
+2017-11,2017,Europe,Standard Class,Consumer,196,74
+2017-11,2017,Europe,Standard Class,Corporate,130,44
+2017-11,2017,Europe,Standard Class,Home Office,57,30
+2017-11,2017,Pacific Asia,First Class,Consumer,98,94
+2017-11,2017,Pacific Asia,First Class,Corporate,70,67
+2017-11,2017,Pacific Asia,First Class,Home Office,42,40
+2017-11,2017,Pacific Asia,Same Day,Consumer,32,18
+2017-11,2017,Pacific Asia,Same Day,Corporate,22,16
+2017-11,2017,Pacific Asia,Same Day,Home Office,14,3
+2017-11,2017,Pacific Asia,Second Class,Consumer,118,93
+2017-11,2017,Pacific Asia,Second Class,Corporate,88,64
+2017-11,2017,Pacific Asia,Second Class,Home Office,45,35
+2017-11,2017,Pacific Asia,Standard Class,Consumer,410,153
+2017-11,2017,Pacific Asia,Standard Class,Corporate,295,111
+2017-11,2017,Pacific Asia,Standard Class,Home Office,139,58
+2017-12,2017,Pacific Asia,First Class,Consumer,153,143
+2017-12,2017,Pacific Asia,First Class,Corporate,103,93
+2017-12,2017,Pacific Asia,First Class,Home Office,57,54
+2017-12,2017,Pacific Asia,Same Day,Consumer,55,34
+2017-12,2017,Pacific Asia,Same Day,Corporate,46,27
+2017-12,2017,Pacific Asia,Same Day,Home Office,29,18
+2017-12,2017,Pacific Asia,Second Class,Consumer,221,171
+2017-12,2017,Pacific Asia,Second Class,Corporate,125,100
+2017-12,2017,Pacific Asia,Second Class,Home Office,70,53
+2017-12,2017,Pacific Asia,Standard Class,Consumer,714,262
+2017-12,2017,Pacific Asia,Standard Class,Corporate,340,137
+2017-12,2017,Pacific Asia,Standard Class,Home Office,211,80
+2018-01,2018,Pacific Asia,First Class,Consumer,160,158
+2018-01,2018,Pacific Asia,First Class,Corporate,95,92
+2018-01,2018,Pacific Asia,First Class,Home Office,73,71
+2018-01,2018,Pacific Asia,Same Day,Consumer,54,15
+2018-01,2018,Pacific Asia,Same Day,Corporate,40,27
+2018-01,2018,Pacific Asia,Same Day,Home Office,26,8
+2018-01,2018,Pacific Asia,Second Class,Consumer,215,169
+2018-01,2018,Pacific Asia,Second Class,Corporate,144,107
+2018-01,2018,Pacific Asia,Second Class,Home Office,86,67
+2018-01,2018,Pacific Asia,Standard Class,Consumer,640,231
+2018-01,2018,Pacific Asia,Standard Class,Corporate,340,138
+2018-01,2018,Pacific Asia,Standard Class,Home Office,250,112

@@ -376,6 +376,7 @@ def late_rate_by_region_bar(
             x=overall_rate,
             line_dash="dash",
             line_color="#444444",
+            layer="below",
             annotation_text=f"Overall {overall_rate:.1%}",
             annotation_position="top",
         )

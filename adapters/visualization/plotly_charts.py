@@ -221,7 +221,7 @@ def shap_dependence_scatter(
     fig.update_layout(
         title=f"SHAP Dependence: {feature_name}",
         xaxis_title=feature_name,
-        yaxis_title="SHAP Value",
+        yaxis_title="SHAP value",
         margin={"t": 50, "b": 40, "l": 60, "r": 20},
         height=350,
     )
@@ -333,7 +333,7 @@ def shipping_mode_bar(data: dict[str, float]) -> go.Figure:
         )
     )
     fig.update_layout(
-        xaxis_title="Late Rate",
+        xaxis_title="Late rate",
         xaxis_tickformat=".0%",
         xaxis={"range": [0, 1]},
         margin={"t": 20, "b": 50, "l": 140, "r": 40},
@@ -365,7 +365,9 @@ def late_rate_by_region_bar(
             orientation="h",
             marker_color="#1f77b4",
             text=[f"{r:.1%}" for r in rates],
-            textposition="outside",
+            textposition="inside",
+            insidetextanchor="end",
+            textfont={"color": "white"},
             hovertemplate="<b>%{y}</b><br>Late rate: %{x:.1%}<extra></extra>",
         )
     )

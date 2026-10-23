@@ -59,20 +59,22 @@ def _build_order_from_form(
 
 def render_prediction_tab(pipeline: dict[str, Any]) -> None:
     """Render the Predict & Explain tab."""
-    st.header("Predict Late Delivery Risk")
+    st.header("Predict late delivery risk")
     st.caption(
         "Scores come from a model trained on a 1,000-order sample so they update "
-        "instantly. See the Model Results tab for results on the full dataset.",
+        "instantly. See the Model results tab for results on the full dataset.",
         help=(
             "The sample model shows how the predictor behaves. Its scores are not "
             "the reported accuracy, which comes from the full 65,752-order dataset."
         ),
     )
 
+    region_options = sorted({o.order_region for o in pipeline["orders"]})
+
     left_col, spacer, right_col = st.columns([4, 1, 6])
 
     with left_col:
-        st.markdown("##### Order Details")
+        st.markdown("##### Order details")
 
         shipping_mode = st.selectbox(
             "Shipping mode",
@@ -94,17 +96,13 @@ def render_prediction_tab(pipeline: dict[str, Any]) -> None:
 
         region = st.selectbox(
             "Order region",
-            options=[
-                "Central America",
-                "Eastern Europe",
-                "North America",
-                "Oceania",
-                "South America",
-                "Southeast Asia",
-                "Southern Africa",
-                "Western Europe",
-            ],
-            index=2,
+            options=region_options,
+            index=(
+                region_options.index("Western Europe")
+                if "Western Europe" in region_options
+                else 0
+            ),
+            format_func=lambda r: " ".join(r.split()),
         )
 
         c1, c2 = st.columns(2)
@@ -171,27 +169,33 @@ def render_prediction_tab(pipeline: dict[str, Any]) -> None:
             st.plotly_chart(gauge_fig, use_container_width=True)
 
             # Risk label badge
-            if result.risk_label:
-                st.error(
-                    f"**Late delivery predicted:** {result.probability:.1%} chance of arriving late"
-                )
+            outcome_help = (
+                "The box uses the same High, Medium and Low bands as the gauge. "
+                "The model itself flags an order as late at a 0.35 cutoff, which "
+                "is the operating point chosen to catch more late orders."
+            )
+            chance = f"{result.probability:.1%} chance of arriving late"
+            if result.probability > 0.70:
+                st.error(f"**High risk:** {chance}")
+            elif result.probability > 0.40:
+                st.warning(f"**Medium risk:** {chance}")
             else:
-                st.success(
-                    f"**On-time delivery expected:** {result.probability:.1%} chance of arriving late"
-                )
+                st.success(f"**Low risk:** {chance}")
+            st.caption("How this box is chosen", help=outcome_help)
 
             # SHAP waterfall
+            local_result = explainer.explain_local(
+                encoder.transform([extract_features(order)]).values,
+                index=0,
+            )
             st.markdown(
                 "##### What drove this prediction?",
                 help=(
                     "Each bar shows how much one order detail pushed the score "
                     "toward late (right) or toward on-time (left), compared with "
-                    "the average order."
+                    "the average order. The starting point for an average order "
+                    f"is {local_result.expected_value:.3f} (SHAP base value)."
                 ),
-            )
-            local_result = explainer.explain_local(
-                encoder.transform([extract_features(order)]).values,
-                index=0,
             )
             waterfall_fig = shap_waterfall(
                 local_result.shap_values, local_result.expected_value
@@ -208,8 +212,8 @@ def render_prediction_tab(pipeline: dict[str, Any]) -> None:
             for feature, value in sorted_shap[:3]:
                 direction = "raises" if value > 0 else "lowers"
                 st.markdown(
-                    f"**{feature_label(feature)}** {direction} the late risk "
-                    f"(SHAP {value:+.2f})"
+                    f"**{feature_label(feature)}** {direction} the late risk",
+                    help=f"SHAP value: {value:+.2f}",
                 )
         else:
             st.markdown("")

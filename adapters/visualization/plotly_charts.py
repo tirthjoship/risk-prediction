@@ -4,8 +4,6 @@ Pure Plotly functions — no Streamlit imports. Each function accepts data
 and returns a go.Figure. Consumed by the Streamlit app layer.
 """
 
-from typing import Optional
-
 import numpy as np
 import plotly.graph_objects as go
 
@@ -43,7 +41,8 @@ def risk_gauge(probability: float) -> go.Figure:
             mode="gauge+number",
             value=pct,
             title={
-                "text": f"Late Delivery Risk<br><span style='font-size:0.8em'>{risk_label}</span>"
+                "text": f"Late delivery risk<br><span style='font-size:0.8em'>{risk_label}</span>",
+                "font": {"size": 24},
             },
             number={"suffix": "%", "font": {"size": 28}},
             gauge={
@@ -66,8 +65,8 @@ def risk_gauge(probability: float) -> go.Figure:
         )
     )
     fig.update_layout(
-        margin={"t": 60, "b": 10, "l": 20, "r": 20},
-        height=250,
+        margin={"t": 80, "b": 10, "l": 20, "r": 20},
+        height=280,
     )
     return fig
 
@@ -95,14 +94,13 @@ def confusion_matrix_heatmap(cm: tuple[tuple[int, ...], ...]) -> go.Figure:
             text=text,
             texttemplate="%{text}",
             colorscale="Blues",
-            showscale=True,
+            showscale=False,
         )
     )
     fig.update_layout(
-        title="Predicted vs actual outcomes",
         xaxis_title="Predicted by the model",
         yaxis_title="What actually happened",
-        margin={"t": 50, "b": 40, "l": 60, "r": 20},
+        margin={"t": 20, "b": 60, "l": 110, "r": 20},
         height=300,
     )
     return fig
@@ -147,10 +145,9 @@ def shap_waterfall(
         )
     )
     fig.update_layout(
-        title=f"What moved this score (starting point: {expected_value:.3f})",
         xaxis_title="Pushes toward on-time (left) or late (right)",
         yaxis={"autorange": "reversed"},
-        margin={"t": 50, "b": 40, "l": 180, "r": 20},
+        margin={"t": 20, "b": 60, "l": 180, "r": 20},
         height=max(200, len(features) * 28 + 80),
     )
     return fig
@@ -183,9 +180,8 @@ def shap_importance_bar(importances: dict[str, float]) -> go.Figure:
         )
     )
     fig.update_layout(
-        title="Which order details matter most",
         xaxis_title="Average impact on the score (mean absolute SHAP)",
-        margin={"t": 50, "b": 40, "l": 180, "r": 20},
+        margin={"t": 20, "b": 60, "l": 180, "r": 20},
         height=max(200, len(features) * 22 + 80),
     )
     return fig
@@ -235,8 +231,8 @@ def shap_dependence_scatter(
 def cluster_scatter_2d(
     X_pca: np.ndarray,
     labels: np.ndarray,
-    cohort_labels: Optional[dict[int, str]] = None,
-    color_map: Optional[dict[int, str]] = None,
+    cohort_labels: dict[int, str] | None = None,
+    color_map: dict[int, str] | None = None,
 ) -> go.Figure:
     """PCA scatter plot with one trace per cluster.
 
@@ -291,7 +287,6 @@ def cluster_scatter_2d(
         )
 
     fig.update_layout(
-        title="How orders group together",
         xaxis_title="Pattern axis 1",
         yaxis_title="Pattern axis 2",
         legend_title="Segment",
@@ -338,18 +333,17 @@ def shipping_mode_bar(data: dict[str, float]) -> go.Figure:
         )
     )
     fig.update_layout(
-        title="Late delivery rate by shipping mode",
         xaxis_title="Late Rate",
         xaxis_tickformat=".0%",
         xaxis={"range": [0, 1]},
-        margin={"t": 50, "b": 40, "l": 140, "r": 20},
-        height=max(200, len(modes) * 40 + 80),
+        margin={"t": 20, "b": 50, "l": 140, "r": 40},
+        height=max(200, len(modes) * 40 + 70),
     )
     return fig
 
 
 def late_rate_by_region_bar(
-    data: dict[str, float], overall_rate: Optional[float] = None
+    data: dict[str, float], overall_rate: float | None = None
 ) -> go.Figure:
     """Horizontal bars of late rate by region, sorted, with an average line.
 
@@ -384,11 +378,13 @@ def late_rate_by_region_bar(
             annotation_position="top",
         )
     fig.update_layout(
-        title="Late delivery rate by region",
         xaxis_title="Share of orders delivered late",
-        xaxis={"range": [0, 0.75], "tickformat": ".0%"},
+        xaxis={
+            "range": [0, max(0.75, max(rates) * 1.12)],
+            "tickformat": ".0%",
+        },
         yaxis={"autorange": "reversed"},
-        margin={"t": 60, "b": 40, "l": 140, "r": 40},
-        height=max(250, len(regions) * 26 + 100),
+        margin={"t": 50, "b": 60, "l": 140, "r": 40},
+        height=max(250, len(regions) * 26 + 110),
     )
     return fig

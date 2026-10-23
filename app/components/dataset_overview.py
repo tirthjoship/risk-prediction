@@ -38,7 +38,7 @@ def render_dataset_tab(
     use_full: bool = True,
 ) -> None:
     """Render the Data Explorer tab."""
-    st.header("Data Explorer")
+    st.header("Data explorer")
 
     if use_full and full_stats:
         ds = full_stats["dataset"]
@@ -149,7 +149,7 @@ def render_dataset_tab(
 - Orders are split into train and test sets before any encoding
 - The encoder learns only from the training orders
 - Property-based tests check that no information leaks
-- 156 tests, 93% code coverage
+- 159 tests, 93% code coverage
             """
         )
 

@@ -12,6 +12,8 @@ from adapters.visualization.labels import (
 def test_feature_label_known_and_prefixed() -> None:
     assert feature_label("sales_per_customer") == "Sales per customer"
     assert feature_label("shipping_mode_Standard Class") == "Shipping: Standard Class"
+    assert feature_label("item_count") == "Items in order"
+    assert feature_label("order_day_of_week") == "Order day of week"
     assert feature_label("some_new_feature") == "Some new feature"
 
 

@@ -1,6 +1,6 @@
 """Streamlit app — Late Delivery Risk Prediction dashboard.
 
-4 tabs: Risk Predictor, Model Results, Customer Segments, Data Explorer.
+4 tabs: Risk predictor, Model results, Customer segments, Data explorer.
 Sidebar toggle switches stats tabs between sample (1K) and full (180K) data.
 Predict tab always uses live sample-trained model for interactivity.
 
@@ -243,9 +243,9 @@ def main() -> None:
             options=["Full dataset (180K rows)", "Sample (1K rows)"],
             index=0,
             help=(
-                "Model Results, Customer Segments and Data Explorer can show "
+                "Model results, Customer segments and Data explorer can show "
                 "either the full dataset (the reported results) or a 1,000-order "
-                "sample that loads faster. The Risk Predictor tab always uses a "
+                "sample that loads faster. The Risk predictor tab always uses a "
                 "model trained on the sample so it responds instantly."
             ),
         )
@@ -350,7 +350,7 @@ or the shipping date. Those are only known after shipment and would give away th
 | Explanations | SHAP |
 | Tracking | MLflow |
 | Code layout | Hexagonal |
-| Tests | 156 tests, 93% coverage |
+| Tests | 159 tests, 93% coverage |
 | Type checks | mypy strict |
 | Dashboard | Streamlit |
                 """
@@ -376,10 +376,10 @@ or the shipping date. Those are only known after shipment and would give away th
     # --- Tabs ---
     tab1, tab2, tab3, tab4 = st.tabs(
         [
-            "Risk Predictor",
-            "Model Results",
-            "Customer Segments",
-            "Data Explorer",
+            "Risk predictor",
+            "Model results",
+            "Customer segments",
+            "Data explorer",
         ]
     )
 

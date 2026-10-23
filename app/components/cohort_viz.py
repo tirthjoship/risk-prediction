@@ -72,7 +72,7 @@ def _render_cohort_card(
     header = f":{color}[**{label}**] ({size:,} orders)"
 
     with st.expander(header, expanded=expanded):
-        c1, c2, c3 = st.columns(3)
+        c1, c2 = st.columns(2)
         c1.metric(
             "Late rate",
             f"{late_rate:.1%}",
@@ -83,12 +83,10 @@ def _render_cohort_card(
             f"{avg_days:.1f}",
             help="Average number of days planned for shipping.",
         )
-        c3.metric(
-            "Risk level",
-            risk_tier_name,
+        st.markdown(
+            f"**Risk level:** :{color}[{risk_tier_name}]",
             help="High is 70% late or more, Medium is 40% to 70%, Low is under 40%.",
         )
-
         st.markdown(f"**Shipping mode:** {dominant_mode}")
 
         if top_regions:
@@ -96,11 +94,11 @@ def _render_cohort_card(
             st.markdown(f"**Top regions:** {region_str}")
 
         if late_rate >= 0.70:
-            st.error("Proactive intervention recommended")
+            st.error("Act now: reroute or warn customers")
         elif late_rate >= 0.40:
             st.warning("Monitor closely")
         else:
-            st.success("Performing within tolerance")
+            st.success("On track")
 
 
 def render_cohorts_tab(
@@ -109,7 +107,7 @@ def render_cohorts_tab(
     use_full: bool = True,
 ) -> None:
     """Render the Customer Segments tab."""
-    st.header("Customer Segments")
+    st.header("Customer segments")
 
     if use_full and full_stats:
         st.markdown(

@@ -22,7 +22,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/python-3.12-blue?logo=python&logoColor=white" alt="Python 3.12" />
   <img src="https://img.shields.io/badge/XGBoost-F1%200.65-green?logo=xgboost" alt="XGBoost F1" />
-  <img src="https://img.shields.io/badge/tests-156%20passed-brightgreen?logo=pytest" alt="Tests" />
+  <img src="https://img.shields.io/badge/tests-159%20passed-brightgreen?logo=pytest" alt="Tests" />
   <img src="https://img.shields.io/badge/coverage-93%25-brightgreen" alt="Coverage" />
   <img src="https://img.shields.io/badge/mypy-strict-blue" alt="mypy strict" />
   <img src="https://img.shields.io/badge/architecture-hexagonal-purple" alt="Hexagonal" />
@@ -72,7 +72,7 @@ That is a valid business conclusion, not a failed project. The **recommended** p
 - [Business Impact (illustrative)](docs/BUSINESS_IMPACT.md): net-value formula with labeled assumptions. No invented ROI.
 - [Frozen metrics](reports/model_comparison.json): source of truth for the table above.
 
-> Interview line: "I shipped a leakage-safe classifier with full MLOps scaffolding, then used SHAP to show a 4-row rule already captures most of the signal, so I recommended the simpler tool. The deliverable was the decision, not the model."
+> In short: the classifier is leakage-safe and fully tracked, but SHAP shows a four-row shipping-mode rule captures most of the signal, so the recommendation is the simpler rule. The useful output was the decision, not the model.
 
 ## Project Journey
 
@@ -93,7 +93,7 @@ flowchart LR
 
 ## Recommended Decision Logic (design, not what the demo ships)
 
-The **recommended** production design below is the interview takeaway from SHAP + EDA. The Streamlit demo today scores **every** shipping mode with the uncalibrated model at threshold **0.35** (an ops compromise; see [Limitations](docs/LIMITATIONS_AND_DECISIONS.md)).
+The **recommended** production design below is the takeaway from SHAP and EDA. The Streamlit demo today scores **every** shipping mode with the uncalibrated model at threshold **0.35** (an ops compromise; see [Limitations](docs/LIMITATIONS_AND_DECISIONS.md)).
 
 ```mermaid
 flowchart TD
@@ -199,7 +199,7 @@ risk-prediction/
 │   ├── streamlit_app.py             # Entry point + sidebar toggle
 │   └── components/                  # Tab implementations
 │
-├── tests/                           # 156 tests, 93% coverage
+├── tests/                           # 159 tests, 93% coverage
 │   ├── test_domain_*.py             # Domain model + service tests
 │   ├── test_ml/                     # Adapter contract tests
 │   ├── test_properties.py           # Hypothesis property-based tests
@@ -288,7 +288,7 @@ The image runs as a non-root user and exposes Streamlit's `/_stcore/health` endp
 
 ## Quality
 
-- **156 tests** at 93% coverage (90% gate enforced in CI)
+- **159 tests** at 93% coverage (90% gate enforced in CI)
 - **mypy strict**: full type safety across domain, adapters, application
 - **Pre-commit hooks**: black, isort, ruff, mypy, gitleaks
 - **Property-based testing**: Hypothesis for domain invariants

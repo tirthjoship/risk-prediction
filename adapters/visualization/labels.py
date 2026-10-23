@@ -15,8 +15,8 @@ _FEATURE_LABELS: dict[str, str] = {
     "total_quantity": "Total quantity",
     "order_month": "Order month",
     "order_profit_per_order": "Profit per order",
-    "total_sales": "Total sales",
-    "n_items": "Number of items",
+    "item_count": "Items in order",
+    "order_day_of_week": "Order day of week",
 }
 
 _PREFIX_LABELS: tuple[tuple[str, str], ...] = (

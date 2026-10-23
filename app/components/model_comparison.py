@@ -39,7 +39,7 @@ def render_model_tab(
     use_full: bool = True,
 ) -> None:
     """Render the Model Results tab."""
-    st.header("Model Results")
+    st.header("Model results")
 
     source = _source_label(use_full)
     if use_full and full_metrics:

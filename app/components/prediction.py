@@ -10,6 +10,7 @@ from typing import Any
 import streamlit as st
 
 from adapters.ml.shap_explainer import ShapExplainer
+from adapters.visualization.labels import feature_label
 from adapters.visualization.plotly_charts import risk_gauge, shap_waterfall
 from application.use_cases import PredictSingleOrderUseCase
 from domain.models import Order, OrderItem
@@ -58,64 +59,86 @@ def _build_order_from_form(
 
 def render_prediction_tab(pipeline: dict[str, Any]) -> None:
     """Render the Predict & Explain tab."""
-    st.header("Predict Late Delivery Risk")
-    st.warning(
-        "**Demo Mode** — This predictor uses a model trained on a 1,000-order "
-        "sample for real-time interactivity. Predictions illustrate how the model "
-        "works, not production-grade accuracy. "
-        "See the **Model Results** tab (Full Dataset) for metrics from 180K orders."
+    st.header("Predict late delivery risk")
+    st.caption(
+        "Scores come from a model trained on a 1,000-order sample so they update "
+        "instantly. See the Model results tab for results on the full dataset.",
+        help=(
+            "The sample model shows how the predictor behaves. Its scores are not "
+            "the reported accuracy, which comes from the full 65,752-order dataset."
+        ),
     )
+
+    region_options = sorted({o.order_region for o in pipeline["orders"]})
 
     left_col, spacer, right_col = st.columns([4, 1, 6])
 
     with left_col:
-        st.markdown("##### Order Details")
+        st.markdown("##### Order details")
 
         shipping_mode = st.selectbox(
-            "Shipping Mode",
+            "Shipping mode",
             options=["Standard Class", "First Class", "Second Class", "Same Day"],
             index=0,
-            help="First Class (95% late) and Second Class (77% late) are high-risk.",
+            help=(
+                "First Class orders are late about 95% of the time and Second "
+                "Class orders about 77% of the time, so both are high risk."
+            ),
         )
 
         days = st.slider(
-            "Scheduled Shipment Days",
+            "Scheduled shipment days",
             min_value=1,
             max_value=10,
             value=4,
+            help="Days the seller planned to take to ship the order.",
         )
 
         region = st.selectbox(
-            "Order Region",
-            options=[
-                "Central America",
-                "Eastern Europe",
-                "North America",
-                "Oceania",
-                "South America",
-                "Southeast Asia",
-                "Southern Africa",
-                "Western Europe",
-            ],
-            index=2,
+            "Order region",
+            options=region_options,
+            index=(
+                region_options.index("Western Europe")
+                if "Western Europe" in region_options
+                else 0
+            ),
+            format_func=lambda r: " ".join(r.split()),
         )
 
         c1, c2 = st.columns(2)
         with c1:
             sales = st.number_input(
-                "Sales ($)", min_value=0.0, max_value=10000.0, value=200.0, step=10.0
+                "Sales ($)",
+                min_value=0.0,
+                max_value=10000.0,
+                value=200.0,
+                step=10.0,
+                help="Total value of the order in dollars.",
             )
             benefit = st.number_input(
-                "Benefit ($)", min_value=-500.0, max_value=2000.0, value=50.0, step=5.0
+                "Benefit ($)",
+                min_value=-500.0,
+                max_value=2000.0,
+                value=50.0,
+                step=5.0,
+                help=(
+                    "Benefit per order: the money the order is expected to earn "
+                    "for the company. Use a negative number for an expected loss."
+                ),
             )
         with c2:
             profit = st.number_input(
-                "Profit ($)", min_value=-1000.0, max_value=5000.0, value=30.0, step=5.0
+                "Profit ($)",
+                min_value=-1000.0,
+                max_value=5000.0,
+                value=30.0,
+                step=5.0,
+                help="Profit on the whole order in dollars. Negative means a loss.",
             )
 
         st.markdown("")
         predict_clicked = st.button(
-            "🔮  Predict Risk", type="primary", use_container_width=True
+            "Predict risk", type="primary", use_container_width=True
         )
 
     with right_col:
@@ -146,20 +169,33 @@ def render_prediction_tab(pipeline: dict[str, Any]) -> None:
             st.plotly_chart(gauge_fig, use_container_width=True)
 
             # Risk label badge
-            if result.risk_label:
-                st.error(
-                    f"**LATE DELIVERY PREDICTED** — {result.probability:.1%} probability"
-                )
+            outcome_help = (
+                "The box uses the same High, Medium and Low bands as the gauge. "
+                "The model itself flags an order as late at a 0.35 cutoff, which "
+                "is the operating point chosen to catch more late orders."
+            )
+            chance = f"{result.probability:.1%} chance of arriving late"
+            if result.probability > 0.70:
+                st.error(f"**High risk:** {chance}")
+            elif result.probability > 0.40:
+                st.warning(f"**Medium risk:** {chance}")
             else:
-                st.success(
-                    f"**ON-TIME DELIVERY EXPECTED** — {result.probability:.1%} probability"
-                )
+                st.success(f"**Low risk:** {chance}")
+            st.caption("How this box is chosen", help=outcome_help)
 
             # SHAP waterfall
-            st.markdown("##### What Drove This Prediction?")
             local_result = explainer.explain_local(
                 encoder.transform([extract_features(order)]).values,
                 index=0,
+            )
+            st.markdown(
+                "##### What drove this prediction?",
+                help=(
+                    "Each bar shows how much one order detail pushed the score "
+                    "toward late (right) or toward on-time (left), compared with "
+                    "the average order. The starting point for an average order "
+                    f"is {local_result.expected_value:.3f} (SHAP base value)."
+                ),
             )
             waterfall_fig = shap_waterfall(
                 local_result.shap_values, local_result.expected_value
@@ -172,35 +208,35 @@ def render_prediction_tab(pipeline: dict[str, Any]) -> None:
                 key=lambda kv: abs(kv[1]),
                 reverse=True,
             )
-            st.markdown("##### Top Contributing Factors")
+            st.markdown("##### Top contributing factors")
             for feature, value in sorted_shap[:3]:
-                direction = "increases" if value > 0 else "reduces"
-                icon = "🔺" if value > 0 else "🔽"
+                direction = "raises" if value > 0 else "lowers"
                 st.markdown(
-                    f"{icon} **{feature}** — SHAP {value:+.4f} ({direction} risk)"
+                    f"**{feature_label(feature)}** {direction} the late risk",
+                    help=f"SHAP value: {value:+.2f}",
                 )
         else:
             st.markdown("")
             st.markdown("")
             st.info(
-                "👈 Fill in order details and click **Predict Risk** to get a "
-                "real-time risk score with SHAP explanation."
+                "Fill in the order details on the left and click **Predict risk** "
+                "to get a risk score with an explanation."
             )
             st.markdown("")
 
             with st.expander("How to read the results", expanded=True):
                 st.markdown(
                     """
-**Risk Gauge:**
-- 🔴 **> 70%** — High Risk → reroute or notify customer
-- 🟡 **40–70%** — Medium Risk → monitor closely
-- 🟢 **< 40%** — Low Risk → proceed normally
+**Risk gauge:**
+- :red[**High**] (above 70%): reroute the order or notify the customer
+- :orange[**Medium**] (40 to 70%): monitor closely
+- :green[**Low**] (below 40%): proceed normally
 
-**SHAP Waterfall:**
-Each bar shows how a feature pushed the prediction UP (toward late)
-or DOWN (toward on-time) from the base rate.
+**Factor chart:**
+Each bar shows how an order detail pushed the score toward late
+or toward on-time, compared with the average order.
 
-**Try this:** Change Shipping Mode from Standard Class to First Class
-and watch the risk gauge jump — shipping mode is the dominant signal.
+**Try this:** change Shipping mode from Standard Class to First Class
+and watch the gauge jump. Shipping mode is the strongest signal.
                     """
                 )

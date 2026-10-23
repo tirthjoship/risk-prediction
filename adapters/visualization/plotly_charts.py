@@ -4,10 +4,10 @@ Pure Plotly functions — no Streamlit imports. Each function accepts data
 and returns a go.Figure. Consumed by the Streamlit app layer.
 """
 
-from typing import Optional
-
 import numpy as np
 import plotly.graph_objects as go
+
+from adapters.visualization.labels import feature_label
 
 
 def risk_gauge(probability: float) -> go.Figure:
@@ -41,7 +41,8 @@ def risk_gauge(probability: float) -> go.Figure:
             mode="gauge+number",
             value=pct,
             title={
-                "text": f"Late Delivery Risk<br><span style='font-size:0.8em'>{risk_label}</span>"
+                "text": f"Late delivery risk<br><span style='font-size:0.8em'>{risk_label}</span>",
+                "font": {"size": 24},
             },
             number={"suffix": "%", "font": {"size": 28}},
             gauge={
@@ -64,8 +65,8 @@ def risk_gauge(probability: float) -> go.Figure:
         )
     )
     fig.update_layout(
-        margin={"t": 60, "b": 10, "l": 20, "r": 20},
-        height=250,
+        margin={"t": 80, "b": 10, "l": 20, "r": 20},
+        height=280,
     )
     return fig
 
@@ -83,7 +84,7 @@ def confusion_matrix_heatmap(cm: tuple[tuple[int, ...], ...]) -> go.Figure:
     """
     labels = ["On-Time", "Late"]
     z = [[cm[i][j] for j in range(len(cm[i]))] for i in range(len(cm))]
-    text = [[str(cm[i][j]) for j in range(len(cm[i]))] for i in range(len(cm))]
+    text = [[f"{cm[i][j]:,}" for j in range(len(cm[i]))] for i in range(len(cm))]
 
     fig = go.Figure(
         go.Heatmap(
@@ -93,14 +94,13 @@ def confusion_matrix_heatmap(cm: tuple[tuple[int, ...], ...]) -> go.Figure:
             text=text,
             texttemplate="%{text}",
             colorscale="Blues",
-            showscale=True,
+            showscale=False,
         )
     )
     fig.update_layout(
-        title="Confusion Matrix",
-        xaxis_title="Predicted",
-        yaxis_title="Actual",
-        margin={"t": 50, "b": 40, "l": 60, "r": 20},
+        xaxis_title="Predicted by the model",
+        yaxis_title="What actually happened",
+        margin={"t": 20, "b": 60, "l": 110, "r": 20},
         height=300,
     )
     return fig
@@ -124,14 +124,14 @@ def shap_waterfall(
     """
     if not shap_values:
         fig = go.Figure()
-        fig.update_layout(title="SHAP Explanation (no features)")
+        fig.update_layout(title="No factors to show")
         return fig
 
     # Sort by absolute magnitude, keep top 10
     sorted_items = sorted(shap_values.items(), key=lambda kv: abs(kv[1]), reverse=True)
     top_items = sorted_items[:10]
 
-    features = [item[0] for item in top_items]
+    features = [feature_label(item[0]) for item in top_items]
     values = [item[1] for item in top_items]
     colors = ["#d62728" if v > 0 else "#1f77b4" for v in values]
 
@@ -141,14 +141,13 @@ def shap_waterfall(
             y=features,
             orientation="h",
             marker_color=colors,
-            hovertemplate="<b>%{y}</b><br>SHAP: %{x:.4f}<extra></extra>",
+            hovertemplate="<b>%{y}</b><br>Push on score: %{x:.3f}<extra></extra>",
         )
     )
     fig.update_layout(
-        title=f"SHAP Explanation (base value: {expected_value:.3f})",
-        xaxis_title="SHAP Value",
+        xaxis_title="Pushes toward on-time (left) or late (right)",
         yaxis={"autorange": "reversed"},
-        margin={"t": 50, "b": 40, "l": 180, "r": 20},
+        margin={"t": 20, "b": 60, "l": 180, "r": 20},
         height=max(200, len(features) * 28 + 80),
     )
     return fig
@@ -168,7 +167,7 @@ def shap_importance_bar(importances: dict[str, float]) -> go.Figure:
     if not filtered:
         filtered = importances  # fallback: show all if everything is tiny
     sorted_items = sorted(filtered.items(), key=lambda kv: kv[1])
-    features = [item[0] for item in sorted_items]
+    features = [feature_label(item[0]) for item in sorted_items]
     values = [item[1] for item in sorted_items]
 
     fig = go.Figure(
@@ -177,13 +176,12 @@ def shap_importance_bar(importances: dict[str, float]) -> go.Figure:
             y=features,
             orientation="h",
             marker_color="#1f77b4",
-            hovertemplate="<b>%{y}</b><br>Mean |SHAP|: %{x:.4f}<extra></extra>",
+            hovertemplate="<b>%{y}</b><br>Average impact: %{x:.3f}<extra></extra>",
         )
     )
     fig.update_layout(
-        title="Global SHAP Feature Importance",
-        xaxis_title="Mean |SHAP Value|",
-        margin={"t": 50, "b": 40, "l": 180, "r": 20},
+        xaxis_title="Average impact on the score (mean absolute SHAP)",
+        margin={"t": 20, "b": 60, "l": 180, "r": 20},
         height=max(200, len(features) * 22 + 80),
     )
     return fig
@@ -223,7 +221,7 @@ def shap_dependence_scatter(
     fig.update_layout(
         title=f"SHAP Dependence: {feature_name}",
         xaxis_title=feature_name,
-        yaxis_title="SHAP Value",
+        yaxis_title="SHAP value",
         margin={"t": 50, "b": 40, "l": 60, "r": 20},
         height=350,
     )
@@ -233,7 +231,8 @@ def shap_dependence_scatter(
 def cluster_scatter_2d(
     X_pca: np.ndarray,
     labels: np.ndarray,
-    cohort_labels: Optional[dict[int, str]] = None,
+    cohort_labels: dict[int, str] | None = None,
+    color_map: dict[int, str] | None = None,
 ) -> go.Figure:
     """PCA scatter plot with one trace per cluster.
 
@@ -241,6 +240,7 @@ def cluster_scatter_2d(
         X_pca: (n_samples, 2) array of PCA-reduced coordinates.
         labels: (n_samples,) integer cluster assignments.
         cohort_labels: Optional mapping of cluster_id → display name.
+        color_map: Optional mapping of cluster_id → color (e.g. by risk tier).
 
     Returns:
         go.Figure with one Scatter trace per cluster.
@@ -276,19 +276,20 @@ def cluster_scatter_2d(
                 mode="markers",
                 name=name,
                 marker={
-                    "color": colors[i % len(colors)],
+                    "color": (color_map or {}).get(
+                        int(cluster_id), colors[i % len(colors)]
+                    ),
                     "size": 7,
                     "opacity": 0.7,
                 },
-                hovertemplate=f"<b>{name}</b><br>PC1: %{{x:.2f}}<br>PC2: %{{y:.2f}}<extra></extra>",
+                hovertemplate=f"<b>{name}</b><extra></extra>",
             )
         )
 
     fig.update_layout(
-        title="Risk Cohort Clusters (PCA)",
-        xaxis_title="PC1",
-        yaxis_title="PC2",
-        legend_title="Cohort",
+        xaxis_title="Pattern axis 1",
+        yaxis_title="Pattern axis 2",
+        legend_title="Segment",
         margin={"t": 50, "b": 40, "l": 60, "r": 20},
         height=400,
     )
@@ -326,47 +327,67 @@ def shipping_mode_bar(data: dict[str, float]) -> go.Figure:
             y=modes,
             orientation="h",
             marker_color=colors,
-            hovertemplate="<b>%{y}</b><br>Late Rate: %{x:.1%}<extra></extra>",
+            text=[f"{r:.1%}" for r in rates],
+            textposition="outside",
+            hovertemplate="<b>%{y}</b><br>Late rate: %{x:.1%}<extra></extra>",
         )
     )
     fig.update_layout(
-        title="Late Delivery Rate by Shipping Mode",
-        xaxis_title="Late Rate",
+        xaxis_title="Late rate",
         xaxis_tickformat=".0%",
         xaxis={"range": [0, 1]},
-        margin={"t": 50, "b": 40, "l": 140, "r": 20},
-        height=max(200, len(modes) * 40 + 80),
+        margin={"t": 20, "b": 50, "l": 140, "r": 40},
+        height=max(200, len(modes) * 40 + 70),
     )
     return fig
 
 
-def late_rate_by_region_bar(data: dict[str, float]) -> go.Figure:
-    """Vertical bar of late delivery rate by region, sorted descending.
+def late_rate_by_region_bar(
+    data: dict[str, float], overall_rate: float | None = None
+) -> go.Figure:
+    """Horizontal bars of late rate by region, sorted, with an average line.
 
     Args:
         data: Region → late rate (0.0–1.0).
+        overall_rate: Overall late rate drawn as a dashed reference line.
 
     Returns:
-        go.Figure with vertical bar trace.
+        go.Figure with a horizontal bar trace.
     """
     sorted_items = sorted(data.items(), key=lambda kv: kv[1], reverse=True)
-    regions = [item[0] for item in sorted_items]
+    regions = [" ".join(item[0].split()) for item in sorted_items]
     rates = [item[1] for item in sorted_items]
 
     fig = go.Figure(
         go.Bar(
-            x=regions,
-            y=rates,
+            x=rates,
+            y=regions,
+            orientation="h",
             marker_color="#1f77b4",
-            hovertemplate="<b>%{x}</b><br>Late Rate: %{y:.1%}<extra></extra>",
+            text=[f"{r:.1%}" for r in rates],
+            textposition="inside",
+            insidetextanchor="end",
+            textfont={"color": "white"},
+            hovertemplate="<b>%{y}</b><br>Late rate: %{x:.1%}<extra></extra>",
         )
     )
+    if overall_rate is not None:
+        fig.add_vline(
+            x=overall_rate,
+            line_dash="dash",
+            line_color="#444444",
+            layer="below",
+            annotation_text=f"Overall {overall_rate:.1%}",
+            annotation_position="top",
+        )
     fig.update_layout(
-        title="Late Delivery Rate by Region",
-        yaxis_title="Late Rate",
-        yaxis_tickformat=".0%",
-        yaxis={"range": [0, 1]},
-        margin={"t": 50, "b": 60, "l": 60, "r": 20},
-        height=350,
+        xaxis_title="Share of orders delivered late",
+        xaxis={
+            "range": [0, max(0.75, max(rates) * 1.12)],
+            "tickformat": ".0%",
+        },
+        yaxis={"autorange": "reversed"},
+        margin={"t": 50, "b": 60, "l": 140, "r": 40},
+        height=max(250, len(regions) * 26 + 110),
     )
     return fig

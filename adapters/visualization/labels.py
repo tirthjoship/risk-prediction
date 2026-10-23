@@ -3,7 +3,7 @@
 from collections.abc import Mapping
 
 HIGH_COLOR = "#B3261E"
-MEDIUM_COLORS = ("#B7791F", "#D9A441")
+MEDIUM_COLORS = ("#B7791F", "#EBC25B")
 LOW_COLOR = "#2F7D4F"
 ACCENT_COLOR = "#1F3A5F"
 

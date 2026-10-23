@@ -42,8 +42,14 @@ def _source_label(use_full: bool) -> str:
 def model_bottom_line(lr_f1: float, xgb_f1: float, use_full: bool) -> str:
     """Decision box: does a complex model beat a simple rule?"""
     gap = xgb_f1 - lr_f1
+    trails = gap <= 0
     barely = gap < _BARELY_F1_GAP
-    answer = f"Barely: {gap:+.3f} F1" if barely else f"Yes: {gap:+.3f} F1"
+    if trails:
+        answer = f"No: {gap:+.3f} F1"
+    elif barely:
+        answer = f"Barely: {gap:+.3f} F1"
+    else:
+        answer = f"Yes: {gap:+.3f} F1"
     test_name = "the time-based test" if use_full else "this 1,000-order sample"
     sentences = [
         (
@@ -150,10 +156,14 @@ def render_model_tab(
     with ui_theme.card(
         "How well the models score",
         (
-            f"XGBoost beats the baseline by {xgb_f1 - lr_f1:+.4f} F1, a small gap "
-            "next to the shipping-mode signal."
-            if xgb_f1 - lr_f1 < _BARELY_F1_GAP
-            else f"XGBoost leads the baseline by {xgb_f1 - lr_f1:+.4f} F1."
+            f"XGBoost trails the baseline by {abs(xgb_f1 - lr_f1):.4f} F1."
+            if xgb_f1 - lr_f1 <= 0
+            else (
+                f"XGBoost beats the baseline by {xgb_f1 - lr_f1:+.4f} F1, a small "
+                "gap next to the shipping-mode signal."
+                if xgb_f1 - lr_f1 < _BARELY_F1_GAP
+                else f"XGBoost leads the baseline by {xgb_f1 - lr_f1:+.4f} F1."
+            )
         ),
         tip=(
             "Both models try to flag orders that will arrive late. Logistic "
@@ -177,12 +187,12 @@ def render_model_tab(
                 )
             )
 
-    lr_tp, lr_fn = lr_cm[1][1], lr_cm[1][0]
-    xgb_tp, xgb_fn = xgb_cm[1][1], xgb_cm[1][0]
+    lr_tp = lr_cm[1][1]
+    xgb_tp = xgb_cm[1][1]
     with ui_theme.card(
         "Right and wrong calls",
-        f"XGBoost catches {xgb_tp:,} of {xgb_tp + xgb_fn:,} late orders; "
-        f"logistic regression catches {lr_tp:,} of {lr_tp + lr_fn:,}.",
+        f"XGBoost correctly flags {xgb_tp:,} late orders; logistic regression "
+        f"correctly flags {lr_tp:,}.",
         tip=(
             "Each box counts orders. The diagonal (on-time called on-time, late "
             "called late) is correct. The off-diagonal boxes are mistakes: late "

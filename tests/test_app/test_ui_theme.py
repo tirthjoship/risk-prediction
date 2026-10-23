@@ -94,6 +94,9 @@ def test_model_bottom_line_barely_and_yes() -> None:
     assert "Barely: +0.012 F1" in barely
     assert "73% of SHAP" in barely
     assert "shipping-mode rule" in barely
+    behind = model_bottom_line(0.70, 0.646, False)
+    assert "No: -0.054 F1" in behind
+    assert ui_theme.AMBER in behind
     yes = model_bottom_line(0.60, 0.70, False)
     assert "Yes: +0.100 F1" in yes
     assert "73%" not in yes
@@ -115,8 +118,8 @@ def test_segment_bottom_line_picks_riskiest() -> None:
         },
     ]
     html = segment_bottom_line(segments, True)
-    assert "Second Class orders: 50 at 80.0% late" in html
-    assert "Prioritise Second Class" in html
+    assert "Second Class segment: 50 orders at 80.0% late" in html
+    assert "Prioritize orders in this segment" in html
     low = segment_bottom_line([{**segments[0], "late_rate": 0.30}], False)
     assert "No segment needs urgent action." in low
 
@@ -127,4 +130,6 @@ def test_dataset_bottom_line_narrow_and_wide() -> None:
     assert "Barely: every region is 49.5% to 57.6% late" in narrow
     assert "Focus on shipping mode, not geography." in narrow
     wide = dataset_bottom_line({"A": 0.2, "B": 0.7}, modes, False)
-    assert "Yes:" in wide
+    assert "Too few orders per region to tell" in wide
+    full_wide = dataset_bottom_line({"A": 0.2, "B": 0.7}, modes, True)
+    assert "Yes:" in full_wide

@@ -92,7 +92,7 @@ def load_full_stats() -> dict[str, Any] | None:
 
 
 @st.cache_resource(
-    show_spinner="Training the models on the sample data. This takes about 5 seconds on first load."
+    show_spinner="Training the models on the sample data. This takes about 10 seconds on first load."
 )
 def load_pipeline() -> dict[str, Any]:
     """Train XGBoost + LogReg on sample CSV, run clustering, compute SHAP."""
@@ -228,7 +228,7 @@ def main() -> None:
     st.set_page_config(
         page_title="Late Delivery Risk Prediction",
         layout="wide",
-        initial_sidebar_state="expanded",
+        initial_sidebar_state="auto",
     )
     ui_theme.inject_css()
 
@@ -285,7 +285,7 @@ def main() -> None:
         st.markdown("---")
         ui_theme.render(
             "<div class='ld-side-foot'>Built by Tirth Joshi<br>"
-            "<a href='https://github.com/tirthjoship/late-delivery-risk-prediction'>"
+            "<a href='https://github.com/tirthjoship/risk-prediction'>"
             "View on GitHub</a></div>"
         )
 
@@ -325,7 +325,7 @@ or the shipping date. Those are only known after shipment and would give away th
 | Explanations | SHAP |
 | Tracking | MLflow |
 | Code layout | Hexagonal |
-| Tests | 159 tests, 93% coverage |
+| Tests | 172 tests, 93% coverage |
 | Type checks | mypy strict |
 | Dashboard | Streamlit |
                 """
@@ -381,7 +381,7 @@ or the shipping date. Those are only known after shipment and would give away th
     ui_theme.render(
         "<div class='ld-side-foot' style='text-align: center;'>"
         "Built with Streamlit, XGBoost and SHAP. "
-        "<a href='https://github.com/tirthjoship/late-delivery-risk-prediction'>"
+        "<a href='https://github.com/tirthjoship/risk-prediction'>"
         "GitHub</a></div>"
     )
 

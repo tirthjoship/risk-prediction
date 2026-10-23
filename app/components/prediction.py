@@ -168,35 +168,33 @@ def render_prediction_tab(pipeline: dict[str, Any]) -> None:
         )
 
         c1, c2 = st.columns(2)
-        with c1:
-            sales = st.number_input(
-                "Sales ($)",
-                min_value=0.0,
-                max_value=10000.0,
-                value=200.0,
-                step=10.0,
-                help="Total value of the order in dollars.",
-            )
-            benefit = st.number_input(
-                "Benefit ($)",
-                min_value=-500.0,
-                max_value=2000.0,
-                value=50.0,
-                step=5.0,
-                help=(
-                    "Benefit per order: the money the order is expected to earn "
-                    "for the company. Use a negative number for an expected loss."
-                ),
-            )
-        with c2:
-            profit = st.number_input(
-                "Profit ($)",
-                min_value=-1000.0,
-                max_value=5000.0,
-                value=30.0,
-                step=5.0,
-                help="Profit on the whole order in dollars. Negative means a loss.",
-            )
+        sales = c1.number_input(
+            "Sales ($)",
+            min_value=0.0,
+            max_value=10000.0,
+            value=200.0,
+            step=10.0,
+            help="Total value of the order in dollars.",
+        )
+        profit = c2.number_input(
+            "Profit ($)",
+            min_value=-1000.0,
+            max_value=5000.0,
+            value=30.0,
+            step=5.0,
+            help="Profit on the whole order in dollars. Negative means a loss.",
+        )
+        benefit = st.number_input(
+            "Benefit ($)",
+            min_value=-500.0,
+            max_value=2000.0,
+            value=50.0,
+            step=5.0,
+            help=(
+                "Benefit per order: the money the order is expected to earn "
+                "for the company. Use a negative number for an expected loss."
+            ),
+        )
 
         predict_clicked = st.button(
             "Predict risk", type="primary", use_container_width=True

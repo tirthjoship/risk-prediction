@@ -39,7 +39,10 @@ def dataset_bottom_line(
     """Decision box: does region matter, or does shipping mode?"""
     low, high = min(region_rates.values()), max(region_rates.values())
     barely = high - low <= 0.10
-    if barely:
+    sparse = not full
+    if sparse:
+        answer = "Too few orders per region to tell"
+    elif barely:
         answer = f"Barely: every region is {low:.1%} to {high:.1%} late"
     else:
         answer = f"Yes: regions range from {low:.1%} to {high:.1%} late"
@@ -48,7 +51,14 @@ def dataset_bottom_line(
     if ordered[-1] not in picks:
         picks.append(ordered[-1])
     mode_text = ", ".join(f"{m.replace(' Class', '')} {r:.1%}" for m, r in picks)
-    if barely:
+    if sparse:
+        sentences = [
+            "The 1,000-order sample leaves only a handful of orders in each "
+            "region, so regional rates are mostly noise.",
+            f"Shipping mode still stands out ({mode_text}).",
+        ]
+        act = "Switch to the full dataset to compare regions."
+    elif barely:
         sentences = [
             f"Across {len(region_rates)} regions the late rate barely moves.",
             f"Shipping mode does matter ({mode_text}).",
@@ -63,7 +73,7 @@ def dataset_bottom_line(
     return ui_theme.bottom_line(
         question="Does region matter?",
         answer=answer,
-        tone="good" if barely else "caution",
+        tone="neutral" if sparse else ("good" if barely else "caution"),
         sentences=sentences,
         act=act,
         confidence="High" if full else "Low",
@@ -196,7 +206,7 @@ def render_dataset_tab(
 - Orders are split into train and test sets before any encoding
 - The encoder learns only from the training orders
 - Property-based tests check that no information leaks
-- 159 tests, 93% code coverage
+- 172 tests, 93% code coverage
                 """
             )
 

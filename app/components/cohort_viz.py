@@ -119,7 +119,7 @@ def segment_bottom_line(segments: list[dict[str, Any]], use_full: bool) -> str:
     others = [c["avg_scheduled_days"] for c in segments if c is not top]
     tier = risk_tier(top["late_rate"])
     mode = top["dominant_shipping_mode"]
-    chip_text = f"{mode} orders: {top['size']:,} at {top['late_rate']:.1%} late"
+    chip_text = f"{mode} segment: {top['size']:,} orders at {top['late_rate']:.1%} late"
     sentences = [
         (
             f"The riskiest segment holds {top['size']:,} of {total:,} orders "
@@ -134,7 +134,10 @@ def segment_bottom_line(segments: list[dict[str, Any]], use_full: bool) -> str:
             "segments."
         )
     if tier == "High":
-        act = f"Prioritise {mode} orders for rerouting or early customer notice."
+        act = (
+            "Prioritize orders in this segment; see Data explorer for the "
+            "riskiest shipping mode (First Class)."
+        )
     elif tier == "Medium":
         act = f"Monitor {mode} orders closely."
     else:

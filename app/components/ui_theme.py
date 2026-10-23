@@ -206,7 +206,7 @@ h1, h2, h3, h4, h5 {
 /* Overview board */
 .ld-tiles.four { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 6px 0 12px; }
 .ld-tiles.four .num { font-size: 26px; }
-.ov-head { min-height: 4em; }
+.ov-head { min-height: 5.5em; }
 .ov-foot { font-size: 12px; color: var(--slate); margin: 10px 0 0; }
 [data-testid="stSelectbox"] label p { font-size: 12.5px; color: var(--slate); }
 

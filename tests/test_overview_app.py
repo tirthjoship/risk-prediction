@@ -3,6 +3,7 @@
 import itertools
 from pathlib import Path
 
+import pandas as pd
 import pytest
 from streamlit.testing.v1 import AppTest
 
@@ -104,7 +105,7 @@ def test_figures_build_for_full_and_filtered_cube() -> None:
     cube = ov.load_cube(CUBE)
     for df in (cube, ov.apply_filters(cube, market="Africa", mode="Same Day")):
         assert len(view.heatmap_figure(df).data) == 2
-        assert len(view.trend_figure(df).data) >= 2
+        assert len(view.trend_figure(df, sorted(cube["month"].unique())).data) >= 2
         assert view.treemap_figure(df).data[0].values[0] == int(df["late_orders"].sum())
         sankey = view.sankey_figure(df).data[0]
         assert sum(sankey.link.value) == int(df["orders"].sum())
@@ -117,3 +118,37 @@ def test_full_app_has_overview_as_first_tab() -> None:
     ).run()
     assert not at.exception
     assert [t.label for t in at.tabs][0] == "Overview"
+
+
+def test_trend_lines_keep_gaps_for_missing_months() -> None:
+    from app.components import overview as view
+
+    cube = ov.load_cube(CUBE)
+    months = sorted(cube["month"].unique())
+    fig = view.trend_figure(ov.apply_filters(cube, market="Africa"), months)
+    for trace in fig.data:
+        assert len(trace.x) == len(months)
+        assert trace.connectgaps is False
+    assert any(pd.isna(v) for v in fig.data[0].y)
+
+
+def test_treemap_root_follows_market_and_is_white() -> None:
+    from app.components import overview as view
+
+    cube = ov.load_cube(CUBE)
+    one = view.treemap_figure(ov.apply_filters(cube, market="LATAM")).data[0]
+    assert one.labels[0] == "LATAM" and one.marker.colors[0] == "#FFFFFF"
+    allm = view.treemap_figure(cube).data[0]
+    assert allm.labels[0] == "All markets" and allm.marker.colors[0] == "#FFFFFF"
+    assert "Standard" in allm.labels and "Standard Class" not in allm.labels
+
+
+def test_trend_caption_flags_partial_coverage() -> None:
+    from app.components import overview as view
+
+    cube = ov.load_cube(CUBE)
+    months = sorted(cube["month"].unique())
+    assert "of 37 months" not in view._trend_caption(cube, months)
+    assert "in 12 of 37 months" in view._trend_caption(
+        ov.apply_filters(cube, year="2016"), months
+    )

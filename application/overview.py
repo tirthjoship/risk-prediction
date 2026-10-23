@@ -7,6 +7,7 @@ late_orders). No Streamlit or Plotly imports, so it is easy to test.
 
 from __future__ import annotations
 
+import math
 from pathlib import Path
 from typing import Any
 
@@ -19,11 +20,17 @@ FAST_MODES = ("First Class", "Second Class")
 # A heatmap row is "the same in every market" when the markets sit within
 # this many percentage points of each other.
 SAME_EVERYWHERE_POINTS = 3.0
-# A monthly line is "steady" when its range stays within this many points.
+# A mode "holds its level" when its quarterly range stays within this many
+# points (or the noise allowance below, if that is larger).
 STEADY_POINTS = 5.0
-# Months with fewer orders than this (per shipping mode) are left out of the
-# steadiness test, because a handful of orders swings the rate.
-MIN_MONTH_ORDERS = 50
+# The all-modes line in the trend chart skips months with fewer orders.
+MIN_MONTH_ORDERS = 150
+# Mode lines skip months with fewer orders than this; the rate is too noisy.
+MIN_PLOT_ORDERS = 30
+# A mode-quarter needs this many orders to count in the trend title.
+MIN_QUARTER_ORDERS = 200
+# Noise allowance: this many standard errors of a quarterly late rate.
+NOISE_Z = 4.5
 # Heatmap cells with fewer orders than this do not count for the title.
 MIN_CELL_ORDERS = 50
 
@@ -195,20 +202,6 @@ def heatmap_title(df: pd.DataFrame) -> str:
     return f"Late rate runs from {pct(lo)} to {pct(hi)} by market and mode"
 
 
-def _mode_ranges(df: pd.DataFrame) -> dict[str, tuple[float, float]]:
-    """Monthly (min, max) late rate per mode, skipping thin months."""
-    monthly = monthly_by_mode(df)
-    monthly = monthly[monthly["orders"] >= MIN_MONTH_ORDERS]
-    ranges: dict[str, tuple[float, float]] = {}
-    for mode, grp in monthly.groupby("shipping_mode"):
-        if len(grp) >= 2:
-            ranges[str(mode)] = (
-                float(grp["late_rate"].min()),
-                float(grp["late_rate"].max()),
-            )
-    return ranges
-
-
 def span_text(months: int) -> str:
     """Plain-language span, for example 37 months -> 'three years'."""
     years = round(months / 12)
@@ -218,32 +211,100 @@ def span_text(months: int) -> str:
     return f"{months} months"
 
 
-def trend_title(df: pd.DataFrame) -> str:
-    """Title for the monthly trend lines.
+def _complete_quarters(df: pd.DataFrame) -> set[str]:
+    """Calendar quarters whose three months all appear in df."""
+    months = pd.PeriodIndex(sorted(set(df["month"])), freq="M")
+    counts = pd.Series(1, index=months.asfreq("Q")).groupby(level=0).sum()
+    return {str(q) for q, n in counts.items() if n == 3}
 
-    Says every mode "holds steady" only when each mode with enough data keeps
-    its monthly late rate within STEADY_POINTS points (months under
-    MIN_MONTH_ORDERS orders are ignored). Otherwise names the steadiest and
-    the most volatile mode.
+
+def mode_quarter_stats(df: pd.DataFrame) -> dict[str, dict[str, float]]:
+    """Quarterly late-rate range per mode, with a noise allowance.
+
+    Only complete quarters count (a quarter with one month of data, such as
+    2018 Q1, is left out) and only mode-quarters with at least
+    MIN_QUARTER_ORDERS orders. A mode needs two such quarters. For each mode:
+    lo and hi are its lowest and highest quarterly late rate, per_month is its
+    median monthly orders, and tolerance is the range (in points) that random
+    noise alone can produce: max(STEADY_POINTS, NOISE_Z standard errors of a
+    quarterly rate at the mode's overall late rate and median quarterly orders).
     """
-    ranges = _mode_ranges(df)
-    if not ranges:
-        return "Not enough orders per month to show a trend"
-    spans = {m: (hi - lo) * 100 for m, (lo, hi) in ranges.items()}
-    months = int(df["month"].nunique())
-    if max(spans.values()) <= STEADY_POINTS:
-        who = "Each shipping mode" if len(ranges) > 1 else f"{next(iter(ranges))}"
-        return f"{who} holds steady for {span_text(months)}"
-    if len(ranges) == 1:
-        mode, (lo, hi) = next(iter(ranges.items()))
-        return f"{mode} moves between {pct(lo)} and {pct(hi)} month to month"
-    calm = min(spans, key=lambda m: spans[m])
-    wild = max(spans, key=lambda m: spans[m])
-    lo, hi = ranges[wild]
-    return (
-        f"{calm} stays steady while {wild} swings from {pct(lo)} to {pct(hi)} "
-        "month to month"
+    complete = _complete_quarters(df)
+    if not complete:
+        return {}
+    monthly = monthly_by_mode(df)
+    monthly["quarter"] = (
+        pd.PeriodIndex(monthly["month"], freq="M").asfreq("Q").astype(str)
     )
+    monthly = monthly[monthly["quarter"].isin(complete)]
+    quarterly = monthly.groupby(["shipping_mode", "quarter"], as_index=False)[
+        ["orders", "late_orders"]
+    ].sum()
+    quarterly = quarterly[quarterly["orders"] >= MIN_QUARTER_ORDERS]
+    stats: dict[str, dict[str, float]] = {}
+    for mode, grp in quarterly.groupby("shipping_mode"):
+        if len(grp) < 2:
+            continue
+        rates = grp["late_orders"] / grp["orders"]
+        p = float(grp["late_orders"].sum() / grp["orders"].sum())
+        noise = NOISE_Z * math.sqrt(p * (1 - p) / float(grp["orders"].median())) * 100
+        used = monthly[
+            (monthly["shipping_mode"] == mode)
+            & monthly["quarter"].isin(set(grp["quarter"]))
+        ]
+        stats[str(mode)] = {
+            "lo": float(rates.min()),
+            "hi": float(rates.max()),
+            "per_month": float(used["orders"].median()),
+            "tolerance": max(STEADY_POINTS, noise),
+            "quarters": float(len(grp)),
+        }
+    return stats
+
+
+def _join_names(modes: list[str]) -> str:
+    """'First, Second and Standard Class' style list of shipping modes."""
+    if all(m.endswith(" Class") for m in modes):
+        names = [m.removesuffix(" Class") for m in modes]
+        suffix = " Class"
+    else:
+        names, suffix = list(modes), ""
+    head = ", ".join(names[:-1])
+    return (f"{head} and {names[-1]}" if head else names[0]) + suffix
+
+
+def trend_title(df: pd.DataFrame) -> str:
+    """Title for the monthly trend lines, judged on complete quarters.
+
+    A mode "holds its level" when its quarterly late-rate range stays within
+    max(STEADY_POINTS, noise allowance), so a thin mode is not called volatile
+    for random noise alone. Modes outside that range are named with their
+    quarterly range and typical monthly orders.
+    """
+    stats = mode_quarter_stats(df)
+    if not stats:
+        return "Not enough orders per quarter to show a trend"
+    steady = [
+        m for m, v in stats.items() if (v["hi"] - v["lo"]) * 100 <= v["tolerance"]
+    ]
+    swinging = [m for m in stats if m not in steady]
+    span = span_text(3 * len(_complete_quarters(df)))
+    if not swinging:
+        who = "Each shipping mode holds" if len(steady) > 1 else f"{steady[0]} holds"
+        return f"{who} its level for {span}"
+    parts: list[str] = []
+    if steady:
+        verb = "hold" if len(steady) > 1 else "holds"
+        parts.append(
+            f"{_join_names(steady)} {verb} {'their' if len(steady) > 1 else 'its'} level for {span}"
+        )
+    for m in swinging:
+        v = stats[m]
+        parts.append(
+            f"{m} ranges {pct(v['lo'])} to {pct(v['hi'])} by quarter "
+            f"(about {round(v['per_month']):,} orders a month)"
+        )
+    return "; ".join(parts)
 
 
 def largest_pool(df: pd.DataFrame) -> tuple[str, str, int] | None:

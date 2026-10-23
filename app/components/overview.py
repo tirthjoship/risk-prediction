@@ -11,6 +11,7 @@ from pathlib import Path
 import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
+from plotly.colors import sample_colorscale
 
 from app.components import ui_theme
 from application import overview as ov
@@ -21,7 +22,14 @@ CUBE_FILE = CUBE_PATH / "order_cube.csv"
 CHART_HEIGHT = 310
 MARGIN = {"l": 4, "r": 4, "t": 6, "b": 4}
 # Sequential scale for late rate: pale cream, amber, brand red.
-RATE_SCALE = [[0.0, "#F7F1E3"], [0.5, "#D9A441"], [1.0, "#B3261E"]]
+RATE_SCALE = [[0.0, "#E8D3A0"], [0.5, "#D9A441"], [1.0, "#B3261E"]]
+# One fixed domain so a color means the same late rate in every chart.
+RATE_MIN, RATE_MAX = 0.35, 1.0
+SHORT_MODE = {
+    "First Class": "First",
+    "Second Class": "Second",
+    "Standard Class": "Standard",
+}
 MODE_COLORS = {
     "First Class": ui_theme.RED,
     "Second Class": ui_theme.AMBER,
@@ -71,9 +79,6 @@ def heatmap_figure(df: pd.DataFrame) -> go.Figure:
     orders = table.pivot(index="market", columns="shipping_mode", values="orders")
     rates = rates.reindex(index=markets, columns=modes)
     orders = orders.reindex(index=markets, columns=modes)
-    lo, hi = float(table["late_rate"].min()), float(table["late_rate"].max())
-    if hi - lo < 0.02:
-        lo, hi = max(0.0, lo - 0.01), min(1.0, hi + 0.01)
     labels = [m.replace(" ", "<br>") for m in modes]
     hover = [
         [
@@ -92,8 +97,8 @@ def heatmap_figure(df: pd.DataFrame) -> go.Figure:
             z=rates.values,
             x=labels,
             y=markets,
-            zmin=lo,
-            zmax=hi,
+            zmin=RATE_MIN,
+            zmax=RATE_MAX,
             colorscale=RATE_SCALE,
             xgap=3,
             ygap=3,
@@ -141,19 +146,32 @@ def heatmap_figure(df: pd.DataFrame) -> go.Figure:
     return fig
 
 
-def trend_figure(df: pd.DataFrame) -> go.Figure:
-    """Monthly late rate by shipping mode, with the overall rate dashed."""
+def trend_figure(df: pd.DataFrame, all_months: list[str] | None = None) -> go.Figure:
+    """Monthly late rate by shipping mode, with the overall rate dashed.
+
+    Every line is reindexed to the full month range, so months with no orders
+    show as gaps instead of being bridged.
+    """
     fig = go.Figure()
+    months = all_months or sorted(df["month"].unique())
+    full = pd.period_range(months[0], months[-1], freq="M").strftime("%Y-%m")
     monthly = ov.monthly_by_mode(df)
-    monthly = monthly[monthly["orders"] >= ov.MIN_MONTH_ORDERS]
+    monthly = monthly[monthly["orders"] >= ov.MIN_PLOT_ORDERS]
     for mode in ov.mode_order(df):
-        part = monthly[monthly["shipping_mode"] == mode].sort_values("month")
+        part = (
+            monthly[monthly["shipping_mode"] == mode]
+            .set_index("month")
+            .reindex(full)
+            .rename_axis("month")
+            .reset_index()
+        )
         fig.add_trace(
             go.Scatter(
                 x=pd.to_datetime(part["month"]),
                 y=part["late_rate"],
                 name=mode,
                 mode="lines",
+                connectgaps=False,
                 line={"color": MODE_COLORS.get(mode, ui_theme.SLATE), "width": 2.2},
                 customdata=part["orders"],
                 hovertemplate=(
@@ -163,13 +181,20 @@ def trend_figure(df: pd.DataFrame) -> go.Figure:
             )
         )
     overall = ov.monthly_overall(df)
-    overall = overall[overall["orders"] >= ov.MIN_MONTH_ORDERS].sort_values("month")
+    overall = (
+        overall[overall["orders"] >= ov.MIN_MONTH_ORDERS]
+        .set_index("month")
+        .reindex(full)
+        .rename_axis("month")
+        .reset_index()
+    )
     fig.add_trace(
         go.Scatter(
             x=pd.to_datetime(overall["month"]),
             y=overall["late_rate"],
             name="All modes",
             mode="lines",
+            connectgaps=False,
             line={"color": ui_theme.INK, "width": 1.6, "dash": "dash"},
             hovertemplate="All modes<br>%{x|%b %Y}: %{y:.1%} late<extra></extra>",
         )
@@ -194,36 +219,57 @@ def trend_figure(df: pd.DataFrame) -> go.Figure:
     return fig
 
 
+def _rate_color(rate: float) -> str:
+    """Color for a late rate on the shared fixed scale."""
+    t = min(1.0, max(0.0, (rate - RATE_MIN) / (RATE_MAX - RATE_MIN)))
+    return str(sample_colorscale(RATE_SCALE, [t])[0])
+
+
 def treemap_figure(df: pd.DataFrame) -> go.Figure:
-    """Late orders by market then shipping mode; color is the late rate."""
+    """Late orders by market then shipping mode; color is the late rate.
+
+    With a single market in view, that market is the root and its shipping
+    modes are the boxes. The root is white; there is no colorbar because the
+    heatmap legend uses the same fixed scale.
+    """
     table = ov.market_mode_table(df)
     table = table[table["late_orders"] > 0]
     by_market = table.groupby("market")[["orders", "late_orders"]].sum()
+    single = len(by_market) == 1
+    root_label = str(by_market.index[0]) if single else "All markets"
     total_late = int(by_market["late_orders"].sum())
     total_orders = int(by_market["orders"].sum())
-    ids, labels, parents, values, colors, orders = (
+    ids, labels, parents, values, rates, orders, full_names = (
         ["all"],
-        ["All markets"],
+        [root_label],
         [""],
         [total_late],
         [ov.rate(total_late, total_orders)],
         [total_orders],
+        [root_label],
     )
-    for market, row in by_market.iterrows():
-        ids.append(str(market))
-        labels.append(str(market))
-        parents.append("all")
-        values.append(int(row["late_orders"]))
-        colors.append(ov.rate(row["late_orders"], row["orders"]))
-        orders.append(int(row["orders"]))
+    colors = ["#FFFFFF"]
+    if not single:
+        for market, row in by_market.iterrows():
+            ids.append(str(market))
+            labels.append(str(market))
+            full_names.append(str(market))
+            parents.append("all")
+            values.append(int(row["late_orders"]))
+            rate = ov.rate(row["late_orders"], row["orders"])
+            rates.append(rate)
+            colors.append(_rate_color(rate))
+            orders.append(int(row["orders"]))
     for _, row in table.iterrows():
-        ids.append(f"{row['market']}|{row['shipping_mode']}")
-        labels.append(str(row["shipping_mode"]))
-        parents.append(str(row["market"]))
+        mode = str(row["shipping_mode"])
+        ids.append(f"{row['market']}|{mode}")
+        labels.append(SHORT_MODE.get(mode, mode))
+        full_names.append(f"{row['market']} {mode}")
+        parents.append("all" if single else str(row["market"]))
         values.append(int(row["late_orders"]))
-        colors.append(float(row["late_rate"]))
+        rates.append(float(row["late_rate"]))
+        colors.append(_rate_color(float(row["late_rate"])))
         orders.append(int(row["orders"]))
-    lo, hi = (min(colors), max(colors)) if colors else (0.0, 1.0)
     fig = go.Figure(
         go.Treemap(
             ids=ids,
@@ -231,27 +277,18 @@ def treemap_figure(df: pd.DataFrame) -> go.Figure:
             parents=parents,
             values=values,
             branchvalues="total",
-            customdata=list(zip(colors, orders, strict=True)),
-            marker={
-                "colors": colors,
-                "colorscale": RATE_SCALE,
-                "cmin": lo,
-                "cmax": hi,
-                "colorbar": _colorbar(),
-                "line": {"width": 2, "color": "#FFFFFF"},
-            },
+            customdata=list(zip(rates, orders, full_names, strict=True)),
+            marker={"colors": colors, "line": {"width": 2, "color": "#FFFFFF"}},
             texttemplate="<b>%{label}</b><br>%{value:,}",
             textfont={"size": 12},
             hovertemplate=(
-                "%{label}<br>%{value:,} late of %{customdata[1]:,} orders"
+                "%{customdata[2]}<br>%{value:,} late of %{customdata[1]:,} orders"
                 "<br>Late rate %{customdata[0]:.1%}<extra></extra>"
             ),
             tiling={"pad": 3},
-            root={"color": "#FFFFFF"},
             pathbar={"visible": False},
         )
     )
-    fig.update_layout(uniformtext={"minsize": 9, "mode": "hide"})
     fig.update_layout(**ui_theme.plotly_layout(height=CHART_HEIGHT, margin=MARGIN))
     return fig
 
@@ -277,7 +314,7 @@ def sankey_figure(df: pd.DataFrame) -> go.Figure:
             node={
                 "label": labels,
                 "color": node_colors,
-                "pad": 18,
+                "pad": 12,
                 "thickness": 16,
                 "line": {"width": 0},
                 "hovertemplate": "%{label}: %{value:,} orders<extra></extra>",
@@ -292,7 +329,7 @@ def sankey_figure(df: pd.DataFrame) -> go.Figure:
                     "<extra></extra>"
                 ),
             },
-            textfont={"size": 12, "color": ui_theme.INK},
+            textfont={"size": 11, "color": ui_theme.INK},
         )
     )
     fig.update_layout(**ui_theme.plotly_layout(height=CHART_HEIGHT, margin=MARGIN))
@@ -318,6 +355,17 @@ def _on_heatmap_click(chart_key: str) -> None:
         st.session_state[key] = ov.ALL
     else:
         st.session_state[key] = market
+
+
+def _trend_caption(df: pd.DataFrame, all_months: list[str]) -> str:
+    """One caption for the trend card; flags a selection with fewer months."""
+    have = int(df["month"].nunique())
+    base = "Monthly late rate; dashed is all modes."
+    if have < len(all_months):
+        return (
+            f"{base} This selection has orders in {have} of {len(all_months)} months."
+        )
+    return base
 
 
 def _head(title: str, caption: str | None = None) -> str:
@@ -388,6 +436,7 @@ def _chart(fig: go.Figure, key: str) -> None:
 def render_overview() -> None:
     """Render the Overview board: filter rail, KPI band and four charts."""
     cube = load_order_cube()
+    all_months = sorted(cube["month"].unique())
     chosen = _filters(cube)
     df = ov.apply_filters(cube, **chosen)
     if df.empty or int(df["orders"].sum()) == 0:
@@ -423,10 +472,10 @@ def render_overview() -> None:
             ui_theme.render(
                 _head(
                     ov.trend_title(df),
-                    "Monthly late rate. Dashed line is all modes.",
+                    _trend_caption(df, all_months),
                 )
             )
-            _chart(trend_figure(df), "ov_trend")
+            _chart(trend_figure(df, all_months), "ov_trend")
     left, right = st.columns(2)
     with left:
         with st.container(border=True):

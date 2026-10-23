@@ -2,6 +2,7 @@
 
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 import pytest
 
@@ -148,49 +149,80 @@ def _months(n: int) -> list[str]:
     return [f"{2015 + i // 12}-{i % 12 + 1:02d}" for i in range(n)]
 
 
-def test_trend_title_steady() -> None:
-    rows = []
-    for i, m in enumerate(_months(36)):
-        rows.append((m, "Europe", "First Class", "Consumer", 100, 95 + (i % 2)))
-        rows.append((m, "Europe", "Standard Class", "Consumer", 100, 38 + (i % 3)))
-    assert (
-        ov.trend_title(_cube(rows)) == "Each shipping mode holds steady for three years"
-    )
-
-
-def test_trend_title_not_steady_beyond_threshold() -> None:
-    rows = []
-    for i, m in enumerate(_months(36)):
-        rows.append((m, "Europe", "First Class", "Consumer", 100, 95))
-        rows.append((m, "Europe", "Same Day", "Consumer", 100, 30 + (i % 2) * 30))
-    title = ov.trend_title(_cube(rows))
-    assert "steady for" not in title
-    assert (
-        title
-        == "First Class stays steady while Same Day swings from 30% to 60% month to month"
-    )
-
-
-def test_trend_title_skips_thin_months() -> None:
-    rows = []
-    for m in _months(24):
-        rows.append((m, "Europe", "First Class", "Consumer", 100, 95))
-    # A 10-order month with a wild rate must not break the steady claim.
-    rows.append(("2017-01", "Europe", "First Class", "Consumer", 10, 1))
-    assert ov.trend_title(_cube(rows)) == "First Class holds steady for two years"
-
-
-def test_trend_title_edge_cases() -> None:
-    thin = _cube([("2015-01", "Europe", "First Class", "Consumer", 10, 5)])
-    assert ov.trend_title(thin) == "Not enough orders per month to show a trend"
-    rows = [
-        (m, "Europe", "Same Day", "Consumer", 100, 30 + (i % 2) * 30)
-        for i, m in enumerate(_months(6))
+def _mode_rows(
+    mode: str, rates: list[float], orders: int
+) -> list[tuple[str, str, str, str, int, int]]:
+    """One row per month for a mode, with a given late rate each month."""
+    return [
+        (m, "Europe", mode, "Consumer", orders, round(orders * r))
+        for m, r in zip(_months(len(rates)), rates, strict=True)
     ]
+
+
+def test_trend_title_full_data(cube: pd.DataFrame) -> None:
+    assert ov.trend_title(cube) == (
+        "First, Second and Standard Class hold their level for three years; "
+        "Same Day ranges 38% to 54% by quarter (about 92 orders a month)"
+    )
+
+
+def test_trend_title_all_steady() -> None:
+    rows = _mode_rows("First Class", [0.95, 0.96] * 18, 300)
+    rows += _mode_rows("Standard Class", [0.38, 0.39, 0.40] * 12, 1000)
     assert (
         ov.trend_title(_cube(rows))
-        == "Same Day moves between 30% and 60% month to month"
+        == "Each shipping mode holds its level for three years"
     )
+
+
+def test_trend_title_real_shift_is_swinging() -> None:
+    rows = _mode_rows("First Class", [0.95] * 36, 300)
+    rows += _mode_rows("Same Day", [0.30] * 18 + [0.60] * 18, 100)
+    title = ov.trend_title(_cube(rows))
+    assert title == (
+        "First Class holds its level for three years; "
+        "Same Day ranges 30% to 60% by quarter (about 100 orders a month)"
+    )
+
+
+def test_trend_title_noise_only_is_steady() -> None:
+    """Binomial noise on a thin mode (100 orders a month) must not read as swinging."""
+    rng = np.random.default_rng(7)
+    late = rng.binomial(100, 0.5, size=36)
+    rows = [
+        (m, "Europe", "Same Day", "Consumer", 100, int(n))
+        for m, n in zip(_months(36), late, strict=True)
+    ]
+    stats = ov.mode_quarter_stats(_cube(rows))["Same Day"]
+    assert (stats["hi"] - stats["lo"]) * 100 <= stats["tolerance"]
+    assert ov.trend_title(_cube(rows)) == "Same Day holds its level for three years"
+
+
+def test_trend_title_tolerance_floor_and_noise_growth() -> None:
+    thick = ov.mode_quarter_stats(_cube(_mode_rows("Standard Class", [0.4] * 12, 2000)))
+    thin = ov.mode_quarter_stats(_cube(_mode_rows("Same Day", [0.5] * 12, 100)))
+    assert thick["Standard Class"]["tolerance"] == ov.STEADY_POINTS
+    assert thin["Same Day"]["tolerance"] > ov.STEADY_POINTS
+
+
+def test_trend_title_excludes_incomplete_quarter() -> None:
+    rows = _mode_rows("First Class", [0.95] * 12, 300)
+    rows.append(("2016-01", "Europe", "First Class", "Consumer", 300, 30))  # lone month
+    assert ov.trend_title(_cube(rows)) == "First Class holds its level for one year"
+
+
+def test_trend_title_skips_thin_quarters_and_missing_data() -> None:
+    thin = _cube(_mode_rows("First Class", [0.9] * 12, 10))
+    assert ov.trend_title(thin) == "Not enough orders per quarter to show a trend"
+    assert ov.trend_title(_cube(_mode_rows("First Class", [0.9] * 2, 300))) == (
+        "Not enough orders per quarter to show a trend"
+    )
+
+
+def test_join_names() -> None:
+    assert ov._join_names(["First Class", "Second Class"]) == "First and Second Class"
+    assert ov._join_names(["Same Day"]) == "Same Day"
+    assert ov._join_names(["Same Day", "First Class"]) == "Same Day and First Class"
 
 
 def test_treemap_and_sankey_titles(cube: pd.DataFrame) -> None:

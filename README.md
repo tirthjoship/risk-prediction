@@ -16,9 +16,9 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/python-3.12-blue?logo=python&logoColor=white" alt="Python 3.12" />
-  <img src="https://img.shields.io/badge/XGBoost-F1%200.65-green?logo=xgboost" alt="XGBoost F1" />
-  <img src="https://img.shields.io/badge/tests-159%20passed-brightgreen?logo=pytest" alt="Tests" />
-  <img src="https://img.shields.io/badge/coverage-93%25-brightgreen" alt="Coverage" />
+  <img src="https://img.shields.io/badge/XGBoost-F1%200.66-green?logo=xgboost" alt="XGBoost F1" />
+  <img src="https://img.shields.io/badge/tests-230%20passed-brightgreen?logo=pytest" alt="Tests" />
+  <img src="https://img.shields.io/badge/coverage-95%25-brightgreen" alt="Coverage" />
   <img src="https://img.shields.io/badge/mypy-strict-blue" alt="mypy strict" />
   <img src="https://img.shields.io/badge/architecture-hexagonal-purple" alt="Hexagonal" />
   <img src="https://img.shields.io/badge/MLflow-experiment%20tracking-blue?logo=mlflow" alt="MLflow" />
@@ -29,6 +29,10 @@
   <a href="https://late-delivery-risk-predict.streamlit.app/">
     <img src="https://static.streamlit.io/badges/streamlit_badge_black_white.svg" alt="Open in Streamlit" />
   </a>
+</p>
+
+<p align="center">
+  <img src="assets/late-delivery-risk-demo.gif" alt="Walkthrough of the late delivery risk dashboard: Overview filters, heatmap, treemap and Sankey, risk predictor, customer segments" width="800" />
 </p>
 
 ---
@@ -250,11 +254,7 @@ make test     # tests only
 
 ## Dashboard
 
-<p align="center">
-  <img src="assets/late-delivery-risk-demo.gif" alt="Walkthrough of the late delivery risk dashboard: Overview filters, heatmap, treemap and Sankey, risk predictor, customer segments" width="800" />
-</p>
-
-Interactive Streamlit dashboard with 5 tabs, starting with a one-screen Overview (live demo linked in the badge above):
+Interactive Streamlit dashboard with 5 tabs, starting with a one-screen Overview (walkthrough at the top of this page):
 
 ```bash
 make app

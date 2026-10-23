@@ -7,6 +7,7 @@ from typing import Any
 import numpy as np
 import streamlit as st
 
+from adapters.visualization.labels import cluster_colors, risk_tier
 from adapters.visualization.plotly_charts import cluster_scatter_2d
 
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
@@ -22,14 +23,38 @@ def _load_full_pca() -> dict[str, Any] | None:
     return None
 
 
-def _risk_indicator(late_rate: float) -> tuple[str, str]:
-    """Return (emoji, tier_label) based on late rate."""
-    if late_rate >= 0.70:
-        return "🔴", "High"
-    elif late_rate >= 0.40:
-        return "🟡", "Medium"
-    else:
-        return "🟢", "Low"
+_TIER_COLOR_NAME = {"High": "red", "Medium": "orange", "Low": "green"}
+
+_PCA_HELP = (
+    "PCA squeezes many order details into two axes so that similar orders sit "
+    "close together. The axes have no business unit of their own."
+)
+
+
+def _distinct_labels(cohorts: list[dict[str, Any]]) -> dict[int, str]:
+    """Return display names, adding a short descriptor when names repeat.
+
+    The descriptor comes from the region mix: a segment where one region holds
+    at least 40% of orders is named after it, otherwise it is called mixed.
+    """
+    counts: dict[str, int] = {}
+    for c in cohorts:
+        counts[c["label"]] = counts.get(c["label"], 0) + 1
+
+    names: dict[int, str] = {}
+    for c in cohorts:
+        name = str(c["label"])
+        if counts[name] > 1:
+            regions = c.get("top_regions") or {}
+            top_region, share = (
+                max(regions.items(), key=lambda kv: kv[1]) if regions else ("", 0.0)
+            )
+            if top_region and share >= 0.40:
+                name = f"{name}, mostly {top_region}"
+            else:
+                name = f"{name}, mixed regions"
+        names[int(c["cluster_id"])] = name
+    return names
 
 
 def _render_cohort_card(
@@ -42,20 +67,33 @@ def _render_cohort_card(
     expanded: bool = False,
 ) -> None:
     """Render a single cohort profile card."""
-    emoji, risk_tier = _risk_indicator(late_rate)
-    header = f"{emoji} {label} — {size:,} orders"
+    risk_tier_name = risk_tier(late_rate)
+    color = _TIER_COLOR_NAME[risk_tier_name]
+    header = f":{color}[**{label}**] ({size:,} orders)"
 
     with st.expander(header, expanded=expanded):
         c1, c2, c3 = st.columns(3)
-        c1.metric("Late Rate", f"{late_rate:.1%}")
-        c2.metric("Avg Days", f"{avg_days:.1f}")
-        c3.metric("Risk Tier", risk_tier)
+        c1.metric(
+            "Late rate",
+            f"{late_rate:.1%}",
+            help="Share of these orders that arrived late.",
+        )
+        c2.metric(
+            "Scheduled days",
+            f"{avg_days:.1f}",
+            help="Average number of days planned for shipping.",
+        )
+        c3.metric(
+            "Risk level",
+            risk_tier_name,
+            help="High is 70% late or more, Medium is 40% to 70%, Low is under 40%.",
+        )
 
-        st.markdown(f"**Shipping Mode:** {dominant_mode}")
+        st.markdown(f"**Shipping mode:** {dominant_mode}")
 
         if top_regions:
-            region_str = " · ".join(f"{r} ({v:.0%})" for r, v in top_regions.items())
-            st.markdown(f"**Top Regions:** {region_str}")
+            region_str = ", ".join(f"{r} ({v:.0%})" for r, v in top_regions.items())
+            st.markdown(f"**Top regions:** {region_str}")
 
         if late_rate >= 0.70:
             st.error("Proactive intervention recommended")
@@ -76,16 +114,18 @@ def render_cohorts_tab(
     if use_full and full_stats:
         st.markdown(
             "<div class='disclaimer-box'>"
-            "🎯 <strong>Showing: Full Dataset (180K)</strong> — 4 clusters from "
-            "65,752 unique orders via K-Means on 10 numeric + shipping mode features"
+            "<strong>Showing: Full dataset (180K rows).</strong> Orders were sorted "
+            "into 4 segments (65,752 unique orders) based on 10 numeric order "
+            "details plus shipping mode."
             "</div>",
             unsafe_allow_html=True,
         )
     else:
         st.markdown(
             "<div class='disclaimer-box warn'>"
-            "⚡ <strong>Showing: Sample (1K)</strong> — clusters from 1,000-order "
-            "sample. Toggle to Full Dataset in sidebar for production segmentation."
+            "<strong>Showing: Sample (1K rows).</strong> Segments are built from the "
+            "1,000-order sample. Switch to the full dataset in the sidebar for the "
+            "segmentation on all orders."
             "</div>",
             unsafe_allow_html=True,
         )
@@ -94,7 +134,11 @@ def render_cohorts_tab(
         cohorts_data = sorted(
             full_stats["cohorts"], key=lambda c: c["late_rate"], reverse=True
         )
-        cohort_label_map = {c["cluster_id"]: c["label"] for c in full_stats["cohorts"]}
+        cohort_label_map = _distinct_labels(full_stats["cohorts"])
+        color_map = cluster_colors(
+            {int(c["cluster_id"]): c["late_rate"] for c in full_stats["cohorts"]}
+        )
+        name_by_id = cohort_label_map
 
         # Try to load pre-computed PCA
         full_pca = _load_full_pca()
@@ -102,21 +146,24 @@ def render_cohorts_tab(
         if full_pca:
             scatter_col, cards_col = st.columns([3, 2])
             with scatter_col:
-                st.markdown("##### Cluster Visualization (PCA 2D)")
+                st.markdown("##### How orders group together", help=_PCA_HELP)
                 st.caption(
-                    f"2,000-point subsample from {full_pca['total_orders']:,} orders"
+                    f"A 2,000-order random subset of {full_pca['total_orders']:,} orders"
                 )
                 X_pca = np.column_stack([full_pca["pc1"], full_pca["pc2"]])
                 cluster_labels = np.array(full_pca["cluster"])
                 scatter_fig = cluster_scatter_2d(
-                    X_pca, cluster_labels, cohort_labels=cohort_label_map
+                    X_pca,
+                    cluster_labels,
+                    cohort_labels=cohort_label_map,
+                    color_map=color_map,
                 )
                 st.plotly_chart(scatter_fig, use_container_width=True)
             with cards_col:
-                st.markdown("##### Cohort Profiles (65,752 orders)")
+                st.markdown("##### Segment profiles (65,752 orders)")
                 for c in cohorts_data:
                     _render_cohort_card(
-                        label=c["label"],
+                        label=name_by_id[int(c["cluster_id"])],
                         size=c["size"],
                         late_rate=c["late_rate"],
                         avg_days=c["avg_scheduled_days"],
@@ -125,10 +172,10 @@ def render_cohorts_tab(
                         expanded=c["late_rate"] >= 0.70,
                     )
         else:
-            st.markdown("##### Cohort Profiles (65,752 orders)")
+            st.markdown("##### Segment profiles (65,752 orders)")
             for c in cohorts_data:
                 _render_cohort_card(
-                    label=c["label"],
+                    label=name_by_id[int(c["cluster_id"])],
                     size=c["size"],
                     late_rate=c["late_rate"],
                     avg_days=c["avg_scheduled_days"],
@@ -141,19 +188,31 @@ def render_cohorts_tab(
         cohorts = pipeline["cohorts"]
         X_pca = pipeline["X_pca"]
         cluster_labels = pipeline["cluster_labels"]
-        cohort_labels = pipeline["cohort_labels"]
+        sample_info = [
+            {
+                "cluster_id": c.cluster_id,
+                "label": c.label,
+                "top_regions": c.region_distribution,
+            }
+            for c in cohorts
+        ]
+        cohort_labels = _distinct_labels(sample_info)
+        sample_colors = cluster_colors({c.cluster_id: c.late_rate for c in cohorts})
 
         scatter_col, cards_col = st.columns([3, 2])
 
         with scatter_col:
-            st.markdown("##### Cluster Visualization (PCA 2D)")
+            st.markdown("##### How orders group together", help=_PCA_HELP)
             scatter_fig = cluster_scatter_2d(
-                X_pca, cluster_labels, cohort_labels=cohort_labels
+                X_pca,
+                cluster_labels,
+                cohort_labels=cohort_labels,
+                color_map=sample_colors,
             )
             st.plotly_chart(scatter_fig, use_container_width=True)
 
         with cards_col:
-            st.markdown("##### Cohort Profiles")
+            st.markdown("##### Segment profiles")
             sorted_cohorts = sorted(cohorts, key=lambda c: c.late_rate, reverse=True)
             for cohort in sorted_cohorts:
                 top_regions = dict(
@@ -164,7 +223,7 @@ def render_cohorts_tab(
                     )[:3]
                 )
                 _render_cohort_card(
-                    label=cohort.label,
+                    label=cohort_labels[cohort.cluster_id],
                     size=cohort.size,
                     late_rate=cohort.late_rate,
                     avg_days=cohort.avg_scheduled_days,

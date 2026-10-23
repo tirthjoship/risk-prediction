@@ -146,7 +146,7 @@ def load_full_stats() -> dict[str, Any] | None:
 
 
 @st.cache_resource(
-    show_spinner="🔄 Training XGBoost + LogReg on sample data — this takes ~5 seconds on first load…"
+    show_spinner="Training the models on the sample data. This takes about 5 seconds on first load."
 )
 def load_pipeline() -> dict[str, Any]:
     """Train XGBoost + LogReg on sample CSV, run clustering, compute SHAP."""
@@ -230,7 +230,6 @@ def main() -> None:
     """Render the Streamlit dashboard."""
     st.set_page_config(
         page_title="Late Delivery Risk Prediction",
-        page_icon="📦",
         layout="wide",
         initial_sidebar_state="expanded",
     )
@@ -238,26 +237,34 @@ def main() -> None:
 
     # --- Sidebar ---
     with st.sidebar:
-        st.markdown("### ⚙️ Settings")
+        st.markdown("### Settings")
         data_source = st.radio(
-            "Statistics Source",
-            options=["Full Dataset (180K)", "Sample (1K)"],
+            "Data shown in the results tabs",
+            options=["Full dataset (180K rows)", "Sample (1K rows)"],
             index=0,
             help=(
-                "Controls which data is shown in Model Results, "
-                "Customer Segments, and Data Explorer tabs. "
-                "Risk Predictor always uses the sample-trained model "
-                "for live interactivity."
+                "Model Results, Customer Segments and Data Explorer can show "
+                "either the full dataset (the reported results) or a 1,000-order "
+                "sample that loads faster. The Risk Predictor tab always uses a "
+                "model trained on the sample so it responds instantly."
             ),
         )
-        use_full = data_source == "Full Dataset (180K)"
+        use_full = data_source == "Full dataset (180K rows)"
 
         st.markdown("---")
-        st.markdown("### 📌 Quick Facts")
-        st.metric("Total Orders", "180,519 rows")
-        st.metric("Unique Orders", "65,752")
-        st.metric("Late Rate", "54.83%")
-        st.metric("Top Signal", "Shipping Mode")
+        st.markdown("### Quick facts")
+        st.metric(
+            "Order lines",
+            "180,519",
+            help="Rows in the raw file. An order can have several lines.",
+        )
+        st.metric("Unique orders", "65,752", help="Orders after combining their lines.")
+        st.metric("Late rate", "54.8%", help="Share of orders delivered late.")
+        st.metric(
+            "Top signal",
+            "Shipping mode",
+            help="The order detail with the largest effect on the late-delivery score.",
+        )
 
         st.markdown("---")
         st.markdown(
@@ -282,64 +289,69 @@ def main() -> None:
     st.markdown(
         "<p style='text-align: center; opacity: 0.6; margin-top: -0.5rem; "
         "margin-bottom: 1.2rem;'>"
-        "Predict · Explain · Compare · Segment</p>",
+        "Predict, explain, compare, segment</p>",
         unsafe_allow_html=True,
     )
 
-    # --- Impact section ---
-    st.markdown(
-        """<div class="impact-card">
-<h3>📍 The Problem</h3>
-<p style="margin-bottom: 12px;">
-<strong>54.83% of e-commerce orders are delivered late</strong> — more than half.
-First Class shipping, despite its premium branding, has a <strong>95.3% late rate</strong>.
-This project predicts which orders will arrive late <em>before they ship</em>,
-enabling logistics teams to reroute, prioritize, or proactively notify customers.
-</p>
-<h3>🎯 What I Built</h3>
-<p style="margin-bottom: 0;">
-An end-to-end ML pipeline with <strong>XGBoost + SHAP explainability</strong>,
-<strong>MLflow experiment tracking</strong>, and <strong>hexagonal architecture</strong>
-for production-grade code structure. On the temporal split the model reaches
-<strong>F1 = 0.6648</strong> (precision 0.7743 / recall 0.5825 at threshold 0.5).
-Shipping mode accounts for ~73% of mean |SHAP| — the model largely re-learns
-a shipping-mode lookup table.
-</p>
-</div>""",
-        unsafe_allow_html=True,
-    )
+    # --- Landing summary ---
+    with st.container(border=True):
+        st.subheader("The problem")
+        st.markdown(
+            "**More than half of orders (54.8%) arrive late.** Shipping mode is the "
+            "main reason: First Class orders are late 95.3% of the time and Second "
+            "Class orders 76.7% of the time, while Standard Class is late 38.1% of "
+            "the time."
+        )
+        st.subheader(
+            "What this app does",
+            help=(
+                "Model details: XGBoost trained on the 52,601 earliest orders and "
+                "tested on the 13,151 latest ones. At a 0.5 cutoff it scores F1 = "
+                "0.6648 (precision 0.7743, recall 0.5825). Shipping mode accounts for "
+                "about 73% of the total feature impact (mean absolute SHAP), "
+                "so the model largely re-learns a shipping-mode lookup. Experiments "
+                "were tracked with MLflow and the code follows a hexagonal "
+                "(ports and adapters) layout."
+            ),
+        )
+        st.markdown(
+            "It estimates the chance that an order will arrive late before it ships, "
+            "shows which order details pushed that estimate up or down, and groups "
+            "orders into segments. Logistics teams can use this to reroute, "
+            "prioritize, or warn customers early."
+        )
 
-    # --- Architecture expander ---
-    with st.expander("🏗️ How It Works — Architecture Overview", expanded=False):
+    # --- Technical notes expander ---
+    with st.expander("How it works (technical notes)", expanded=False):
         col_a, col_b = st.columns([3, 2])
         with col_a:
             st.markdown(
                 """
-**Data Flow:**
-1. Raw CSV → Leakage Shield (drops 3 post-shipment columns)
-2. Domain entities → Feature extraction (12 pre-shipment features)
-3. Train/test split FIRST → then encode (prevents preprocessing leakage)
-4. XGBoost + Logistic Regression → evaluate with F1 (not accuracy)
-5. SHAP TreeExplainer → global + local feature explanations
-6. MLflow → log params, metrics, model artifacts, Model Registry
+**Data flow:**
+1. The raw file passes through a leakage filter that drops 3 columns recorded after shipping.
+2. Each order gets 12 features that are known before it ships.
+3. Orders are split into train and test sets first, then encoded (this avoids preprocessing leakage).
+4. XGBoost and Logistic Regression are compared on F1, not accuracy.
+5. SHAP explains the model for all orders and for a single order.
+6. MLflow logs parameters, metrics and model files.
 
-**Key Safeguard:** The model never sees `Days for shipping (real)`,
-`Delivery Status`, or `shipping date` — these are post-shipment data
-that would leak the answer.
+**Key safeguard:** the model never sees actual shipping days, delivery status,
+or the shipping date. Those are only known after shipment and would give away the answer.
                 """
             )
         with col_b:
             st.markdown(
                 """
-**Tech Stack:**
+**Tech stack:**
+
 | Layer | Tool |
 |-------|------|
-| ML Models | XGBoost, LogReg |
-| Explainability | SHAP |
+| Models | XGBoost, Logistic Regression |
+| Explanations | SHAP |
 | Tracking | MLflow |
-| Architecture | Hexagonal |
-| Testing | 156 tests, 93% cov |
-| Type Safety | mypy strict |
+| Code layout | Hexagonal |
+| Tests | 156 tests, 93% coverage |
+| Type checks | mypy strict |
 | Dashboard | Streamlit |
                 """
             )
@@ -351,11 +363,10 @@ that would leak the answer.
     with loading_placeholder.container():
         st.markdown(
             "<div style='text-align: center; padding: 3rem 0;'>"
-            "<div style='font-size: 2.5rem; margin-bottom: 0.5rem;'>🔄</div>"
             "<h3 style='margin-bottom: 0.3rem;'>Preparing Dashboard</h3>"
             "<p style='opacity: 0.6;'>Training XGBoost + LogReg on sample data "
-            "and computing SHAP explanations…<br>"
-            "<em>First load takes ~10 seconds, then cached.</em></p>"
+            "and computing explanations.<br>"
+            "<em>The first load takes about 10 seconds, then it is cached.</em></p>"
             "</div>",
             unsafe_allow_html=True,
         )
@@ -365,10 +376,10 @@ that would leak the answer.
     # --- Tabs ---
     tab1, tab2, tab3, tab4 = st.tabs(
         [
-            "🔮 Risk Predictor",
-            "📊 Model Results",
-            "🎯 Customer Segments",
-            "📋 Data Explorer",
+            "Risk Predictor",
+            "Model Results",
+            "Customer Segments",
+            "Data Explorer",
         ]
     )
 
@@ -396,7 +407,7 @@ that would leak the answer.
     st.markdown("---")
     st.markdown(
         "<div style='text-align: center; opacity: 0.4; font-size: 0.78rem;'>"
-        "Streamlit · XGBoost · SHAP · MLflow · Hexagonal Architecture · "
+        "Built with Streamlit, XGBoost and SHAP. "
         "<a href='https://github.com/tirthjoship/late-delivery-risk-prediction' "
         "style='color: inherit;'>GitHub</a></div>",
         unsafe_allow_html=True,

@@ -383,12 +383,8 @@ or the shipping date. Those are only known after shipment and would give away th
         render_dataset_tab(pipeline, full_stats, use_full)
 
     # --- Footer ---
-    st.markdown("---")
     ui_theme.render(
-        "<div class='ld-side-foot' style='text-align: center;'>"
-        "Built with Streamlit, XGBoost and SHAP. "
-        "<a href='https://github.com/tirthjoship/risk-prediction'>"
-        "GitHub</a></div>"
+        ui_theme.author_footer("DataCo public supply chain data, 2015 to 2018.")
     )
 
 

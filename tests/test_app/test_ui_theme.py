@@ -133,3 +133,11 @@ def test_dataset_bottom_line_narrow_and_wide() -> None:
     assert "Too few orders per region to tell" in wide
     full_wide = dataset_bottom_line({"A": 0.2, "B": 0.7}, modes, True)
     assert "Yes:" in full_wide
+
+
+def test_author_footer_credit_line() -> None:
+    out = ui_theme.author_footer("A note.")
+    assert "Built by Tirth Joshi" in out and out.endswith("A note.</div>")
+    assert out.count('target="_blank" rel="noopener"') == 2
+    assert "https://github.com/tirthjoship/risk-prediction" in out
+    assert "https://linkedin.com/in/tirthjoshi" in out

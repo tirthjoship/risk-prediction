@@ -7,7 +7,13 @@ and returns a go.Figure. Consumed by the Streamlit app layer.
 import numpy as np
 import plotly.graph_objects as go
 
-from adapters.visualization.labels import feature_label
+from adapters.visualization.labels import (
+    ACCENT_COLOR,
+    HIGH_COLOR,
+    LOW_COLOR,
+    MEDIUM_COLORS,
+    feature_label,
+)
 
 
 def risk_gauge(probability: float) -> go.Figure:
@@ -27,13 +33,13 @@ def risk_gauge(probability: float) -> go.Figure:
     pct = round(probability * 100, 1)
 
     if probability > 0.70:
-        bar_color = "#d62728"
+        bar_color = HIGH_COLOR
         risk_label = "HIGH RISK"
     elif probability > 0.40:
-        bar_color = "#ff7f0e"
+        bar_color = MEDIUM_COLORS[0]
         risk_label = "MEDIUM RISK"
     else:
-        bar_color = "#2ca02c"
+        bar_color = LOW_COLOR
         risk_label = "LOW RISK"
 
     fig = go.Figure(
@@ -42,19 +48,19 @@ def risk_gauge(probability: float) -> go.Figure:
             value=pct,
             title={
                 "text": f"Late delivery risk<br><span style='font-size:0.8em'>{risk_label}</span>",
-                "font": {"size": 24},
+                "font": {"size": 18},
             },
             number={"suffix": "%", "font": {"size": 28}},
             gauge={
                 "axis": {"range": [0, 100], "tickwidth": 1},
                 "bar": {"color": bar_color, "thickness": 0.3},
                 "bgcolor": "white",
-                "borderwidth": 2,
-                "bordercolor": "gray",
+                "borderwidth": 1,
+                "bordercolor": "#EAECEF",
                 "steps": [
-                    {"range": [0, 40], "color": "#e8f5e9"},
-                    {"range": [40, 70], "color": "#fff3e0"},
-                    {"range": [70, 100], "color": "#ffebee"},
+                    {"range": [0, 40], "color": "#E3F3E9"},
+                    {"range": [40, 70], "color": "#F8EDD6"},
+                    {"range": [70, 100], "color": "#F9E2E0"},
                 ],
                 "threshold": {
                     "line": {"color": bar_color, "width": 4},
@@ -93,7 +99,7 @@ def confusion_matrix_heatmap(cm: tuple[tuple[int, ...], ...]) -> go.Figure:
             y=labels,
             text=text,
             texttemplate="%{text}",
-            colorscale="Blues",
+            colorscale=[[0.0, "#F1F4F8"], [1.0, ACCENT_COLOR]],
             showscale=False,
         )
     )
@@ -133,7 +139,7 @@ def shap_waterfall(
 
     features = [feature_label(item[0]) for item in top_items]
     values = [item[1] for item in top_items]
-    colors = ["#d62728" if v > 0 else "#1f77b4" for v in values]
+    colors = [HIGH_COLOR if v > 0 else ACCENT_COLOR for v in values]
 
     fig = go.Figure(
         go.Bar(
@@ -175,7 +181,7 @@ def shap_importance_bar(importances: dict[str, float]) -> go.Figure:
             x=values,
             y=features,
             orientation="h",
-            marker_color="#1f77b4",
+            marker_color=ACCENT_COLOR,
             hovertemplate="<b>%{y}</b><br>Average impact: %{x:.3f}<extra></extra>",
         )
     )
@@ -249,14 +255,14 @@ def cluster_scatter_2d(
     unique_clusters = sorted(set(labels.tolist()))
 
     colors = [
-        "#1f77b4",
-        "#d62728",
-        "#2ca02c",
-        "#ff7f0e",
-        "#9467bd",
-        "#8c564b",
-        "#e377c2",
-        "#7f7f7f",
+        ACCENT_COLOR,
+        HIGH_COLOR,
+        LOW_COLOR,
+        MEDIUM_COLORS[0],
+        "#5C6B7A",
+        MEDIUM_COLORS[1],
+        "#8FA3BD",
+        "#0D0F12",
     ]
 
     for i, cluster_id in enumerate(unique_clusters):
@@ -289,9 +295,14 @@ def cluster_scatter_2d(
     fig.update_layout(
         xaxis_title="Pattern axis 1",
         yaxis_title="Pattern axis 2",
-        legend_title="Segment",
-        margin={"t": 50, "b": 40, "l": 60, "r": 20},
-        height=400,
+        legend={
+            "orientation": "h",
+            "yanchor": "top",
+            "y": -0.2,
+            "title": {"text": "Segment"},
+        },
+        margin={"t": 20, "b": 40, "l": 60, "r": 20},
+        height=460,
     )
     return fig
 
@@ -315,11 +326,11 @@ def shipping_mode_bar(data: dict[str, float]) -> go.Figure:
     colors = []
     for r in rates:
         if r > 0.70:
-            colors.append("#d62728")
+            colors.append(HIGH_COLOR)
         elif r > 0.40:
-            colors.append("#ff7f0e")
+            colors.append(MEDIUM_COLORS[0])
         else:
-            colors.append("#2ca02c")
+            colors.append(LOW_COLOR)
 
     fig = go.Figure(
         go.Bar(
@@ -335,7 +346,7 @@ def shipping_mode_bar(data: dict[str, float]) -> go.Figure:
     fig.update_layout(
         xaxis_title="Late rate",
         xaxis_tickformat=".0%",
-        xaxis={"range": [0, 1]},
+        xaxis={"range": [0, 1.12]},
         margin={"t": 20, "b": 50, "l": 140, "r": 40},
         height=max(200, len(modes) * 40 + 70),
     )
@@ -363,7 +374,7 @@ def late_rate_by_region_bar(
             x=rates,
             y=regions,
             orientation="h",
-            marker_color="#1f77b4",
+            marker_color=ACCENT_COLOR,
             text=[f"{r:.1%}" for r in rates],
             textposition="inside",
             insidetextanchor="end",
@@ -375,7 +386,7 @@ def late_rate_by_region_bar(
         fig.add_vline(
             x=overall_rate,
             line_dash="dash",
-            line_color="#444444",
+            line_color="#5C6B7A",
             layer="below",
             annotation_text=f"Overall {overall_rate:.1%}",
             annotation_position="top",

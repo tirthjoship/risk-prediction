@@ -1,6 +1,6 @@
 """Streamlit app — Late Delivery Risk Prediction dashboard.
 
-4 tabs: Risk predictor, Model results, Customer segments, Data explorer.
+5 tabs: Overview, Risk predictor, Model results, Customer segments, Data explorer.
 Sidebar toggle switches stats tabs between sample (1K) and full (180K) data.
 Predict tab always uses live sample-trained model for interactivity.
 
@@ -331,24 +331,10 @@ or the shipping date. Those are only known after shipment and would give away th
                 """
             )
 
-    # --- Train pipeline (shows animated loading while training) ---
-    loading_placeholder = st.empty()
-    with loading_placeholder.container():
-        st.markdown(
-            "<div style='text-align: center; padding: 3rem 0;'>"
-            "<div class='ld-card-title'>Preparing the dashboard</div>"
-            "<p class='ld-takeaway'>Training XGBoost and logistic regression on "
-            "the sample data and computing explanations.<br>"
-            "The first load takes about 10 seconds, then it is cached.</p>"
-            "</div>",
-            unsafe_allow_html=True,
-        )
-    pipeline = load_pipeline()
-    loading_placeholder.empty()
-
-    # --- Tabs ---
-    tab1, tab2, tab3, tab4 = st.tabs(
+    # --- Tabs (Overview renders first, from the committed cube, no training) ---
+    tab0, tab1, tab2, tab3, tab4 = st.tabs(
         [
+            "Overview",
             "Risk predictor",
             "Model results",
             "Customer segments",
@@ -356,7 +342,27 @@ or the shipping date. Those are only known after shipment and would give away th
         ]
     )
 
+    with tab0:
+        from app.components.overview import render_overview
+
+        render_overview()
+
+    # --- Train pipeline (shows a loading note inside the Risk predictor tab) ---
     with tab1:
+        loading_placeholder = st.empty()
+        with loading_placeholder.container():
+            st.markdown(
+                "<div style='text-align: center; padding: 3rem 0;'>"
+                "<div class='ld-card-title'>Preparing the dashboard</div>"
+                "<p class='ld-takeaway'>Training XGBoost and logistic regression on "
+                "the sample data and computing explanations.<br>"
+                "The first load takes about 10 seconds, then it is cached.</p>"
+                "</div>",
+                unsafe_allow_html=True,
+            )
+        pipeline = load_pipeline()
+        loading_placeholder.empty()
+
         from app.components.prediction import render_prediction_tab
 
         render_prediction_tab(pipeline)

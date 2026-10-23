@@ -195,7 +195,7 @@ risk-prediction/
 ├── application/                     # Orchestration layer
 │   └── use_cases.py                 # Train, Predict, Cluster, Profile
 │
-├── app/                             # Streamlit dashboard (4 tabs)
+├── app/                             # Streamlit dashboard (5 tabs)
 │   ├── streamlit_app.py             # Entry point + sidebar toggle
 │   └── components/                  # Tab implementations
 │
@@ -207,6 +207,7 @@ risk-prediction/
 │
 ├── notebooks/                       # EDA + training narrative
 ├── scripts/train.py                 # CLI training entry point
+├── scripts/export_dashboard.py      # Builds the order cube behind the Overview tab
 ├── data/                            # Raw (gitignored) + sample (committed)
 └── .github/workflows/               # CI: lint, test, typecheck, security
 ```
@@ -239,6 +240,10 @@ python scripts/train.py --sample
 #    Place CSV in data/raw/DataCoSupplyChainDataset.csv
 python scripts/train.py
 
+# 3b. Rebuild the Overview tab data (needs the raw CSV above; output is committed)
+python scripts/export_dashboard.py data/raw/DataCoSupplyChainDataset.csv
+#     writes data/dashboard/order_cube.csv (orders by month, market, mode, segment)
+
 # 4. View experiment dashboard
 mlflow ui --backend-store-uri sqlite:///mlflow.db
 # Open http://localhost:5000
@@ -254,13 +259,14 @@ make test     # tests only
   <img src="assets/streamlit-demo.gif" alt="Dashboard walkthrough" width="760" />
 </p>
 
-Interactive Streamlit dashboard with 4 tabs (live demo linked in the badge above):
+Interactive Streamlit dashboard with 5 tabs, starting with a one-screen Overview (live demo linked in the badge above):
 
 ```bash
 make app
 # Opens at http://localhost:8501
 ```
 
+- Overview: Filters, four KPI tiles and four linked charts (market by mode heatmap, monthly trend, late-order treemap, shipping mode flow) from the order cube; every title is computed from the filtered data
 - Risk Predictor: Enter order details, get live risk score plus SHAP waterfall
 - Model Results: Side-by-side LogReg vs XGBoost metrics plus SHAP importance
 - Customer Segments: K-Means cluster profiles plus PCA scatter

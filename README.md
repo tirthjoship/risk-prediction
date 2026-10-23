@@ -1,8 +1,3 @@
-<!-- Banner placeholder: replace with your custom banner image -->
-<!-- <p align="center">
-  <img src="assets/banner.png" alt="Late Delivery Risk Prediction" width="900" />
-</p> -->
-
 <h1 align="center">Late Delivery Risk Prediction</h1>
 
 <p align="center">
@@ -256,7 +251,7 @@ make test     # tests only
 ## Dashboard
 
 <p align="center">
-  <img src="assets/streamlit-demo.gif" alt="Dashboard walkthrough" width="760" />
+  <img src="assets/late-delivery-risk-demo.gif" alt="Walkthrough of the late delivery risk dashboard: Overview filters, heatmap, treemap and Sankey, risk predictor, customer segments" width="800" />
 </p>
 
 Interactive Streamlit dashboard with 5 tabs, starting with a one-screen Overview (live demo linked in the badge above):

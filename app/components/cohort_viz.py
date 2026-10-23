@@ -35,7 +35,7 @@ def _distinct_labels(cohorts: list[dict[str, Any]]) -> dict[int, str]:
     """Return display names, adding a short descriptor when names repeat.
 
     The descriptor comes from the region mix: a segment where one region holds
-    at least 40% of orders is named after it, otherwise it is called mixed.
+    at least 40% of orders is named after it (for example "Western Europe focus"), otherwise it is called mixed.
     """
     counts: dict[str, int] = {}
     for c in cohorts:
@@ -50,7 +50,7 @@ def _distinct_labels(cohorts: list[dict[str, Any]]) -> dict[int, str]:
                 max(regions.items(), key=lambda kv: kv[1]) if regions else ("", 0.0)
             )
             if top_region and share >= 0.40:
-                name = f"{name}, mostly {top_region}"
+                name = f"{name}, {top_region} focus"
             else:
                 name = f"{name}, mixed regions"
         names[int(c["cluster_id"])] = name

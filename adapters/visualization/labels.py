@@ -2,9 +2,10 @@
 
 from collections.abc import Mapping
 
-HIGH_COLOR = "#d62728"
-MEDIUM_COLORS = ("#ff7f0e", "#b8860b")
-LOW_COLOR = "#2ca02c"
+HIGH_COLOR = "#B3261E"
+MEDIUM_COLORS = ("#B7791F", "#D9A441")
+LOW_COLOR = "#2F7D4F"
+ACCENT_COLOR = "#1F3A5F"
 
 _FEATURE_LABELS: dict[str, str] = {
     "days_for_shipment_scheduled": "Scheduled shipment days",

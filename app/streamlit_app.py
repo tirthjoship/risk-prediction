@@ -31,67 +31,13 @@ from adapters.ml.sklearn_predictor import (  # noqa: E402
     LogisticRegressionPredictor,
     XGBoostPredictor,
 )
+from app.components import ui_theme  # noqa: E402
 from application.use_cases import (  # noqa: E402
     ProfileClustersUseCase,
     TrainAndEvaluateUseCase,
 )
 from domain.models import RiskCohort  # noqa: E402
 from domain.ports import ExperimentTrackerPort  # noqa: E402
-
-# ---------------------------------------------------------------------------
-# Custom CSS — tuned for light theme
-# ---------------------------------------------------------------------------
-_CUSTOM_CSS = """
-<style>
-    .block-container { padding-top: 1.5rem; padding-bottom: 2rem; }
-
-    /* Tabs */
-    .stTabs [data-baseweb="tab-list"] { gap: 4px; }
-    .stTabs [data-baseweb="tab"] { padding: 10px 20px; font-weight: 600; }
-
-    /* Metric cards */
-    [data-testid="stMetric"] {
-        background-color: #F0F2F6;
-        border: 1px solid #E0E4EA;
-        border-radius: 8px;
-        padding: 12px 16px;
-    }
-    [data-testid="stMetricLabel"] { font-size: 0.85rem; opacity: 0.8; }
-    [data-testid="stMetricValue"] { font-size: 1.4rem; font-weight: 700; }
-
-    /* Disclaimer boxes */
-    .disclaimer-box {
-        background-color: #F7F8FA;
-        border-left: 3px solid #4A9EFF;
-        padding: 8px 14px;
-        border-radius: 4px;
-        font-size: 0.82rem;
-        margin-bottom: 1rem;
-        opacity: 0.95;
-    }
-    .disclaimer-box.warn {
-        border-left-color: #E09B3D;
-    }
-
-    /* Impact card */
-    .impact-card {
-        background: #F7F8FA;
-        border: 1px solid #E0E4EA;
-        border-radius: 12px;
-        padding: 20px 24px;
-        margin-bottom: 1.5rem;
-    }
-    .impact-card h3 { margin-top: 0; margin-bottom: 8px; }
-
-    /* Section spacing */
-    .section-gap { margin-top: 1.5rem; }
-
-    /* Sidebar styling */
-    [data-testid="stSidebar"] [data-testid="stMetric"] {
-        background-color: #FFFFFF;
-    }
-</style>
-"""
 
 
 # ---------------------------------------------------------------------------
@@ -224,6 +170,57 @@ def load_pipeline() -> dict[str, Any]:
 
 
 # ---------------------------------------------------------------------------
+# Header
+# ---------------------------------------------------------------------------
+def _app_header(
+    full_metrics: dict[str, Any] | None, full_stats: dict[str, Any] | None
+) -> str:
+    """Build the app header from the saved metrics files."""
+    lines, orders, late_rate = 180519, 65752, 0.548
+    if full_stats:
+        ds = full_stats["dataset"]
+        lines = ds.get("total_rows", lines)
+        orders = ds["total_orders"]
+        late_rate = ds["late_rate"]
+    f1_text = "F1 0.66"
+    split_tip = (
+        "The models learned from the earliest orders and were tested on the "
+        "latest ones, like real use where the future is unknown."
+    )
+    f1_tip = (
+        "F1 balances precision and recall for XGBoost on the later orders, at a "
+        "0.5 cutoff. 1.0 is perfect."
+    )
+    if full_metrics:
+        xgb = full_metrics["models"]["XGBoost"]
+        f1_text = f"F1 {xgb['f1']:.2f}"
+        split_tip = (
+            f"The models learned from the {full_metrics['train_size']:,} earliest "
+            f"orders and were tested on the {full_metrics['test_size']:,} latest "
+            "ones, like real use where the future is unknown."
+        )
+        f1_tip = (
+            f"XGBoost on the later orders at a 0.5 cutoff: F1 {xgb['f1']:.4f} "
+            f"(precision {xgb['precision']:.4f}, recall {xgb['recall']:.4f}). "
+            "1.0 is perfect."
+        )
+    return ui_theme.header(
+        eyebrow="SUPPLY CHAIN \u00b7 LATE DELIVERY RISK",
+        headline="Which orders will arrive late, and why?",
+        summary=(
+            f"{late_rate:.1%} of orders arrive late. This brief scores each order "
+            "before it ships, shows what drives the risk, and says what to do first."
+        ),
+        chips=[
+            (f"{lines // 1000}K order lines", None),
+            (f"{orders:,} orders", None),
+            ("Time-based test", split_tip),
+            (f1_text, f1_tip),
+        ],
+    )
+
+
+# ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
 def main() -> None:
@@ -233,7 +230,7 @@ def main() -> None:
         layout="wide",
         initial_sidebar_state="expanded",
     )
-    st.markdown(_CUSTOM_CSS, unsafe_allow_html=True)
+    ui_theme.inject_css()
 
     # --- Sidebar ---
     with st.sidebar:
@@ -252,74 +249,52 @@ def main() -> None:
         use_full = data_source == "Full dataset (180K rows)"
 
         st.markdown("---")
-        st.markdown("### Quick facts")
-        st.metric(
-            "Order lines",
-            "180,519",
-            help="Rows in the raw file. An order can have several lines.",
-        )
-        st.metric("Unique orders", "65,752", help="Orders after combining their lines.")
-        st.metric("Late rate", "54.8%", help="Share of orders delivered late.")
-        st.metric(
-            "Top signal",
-            "Shipping mode",
-            help="The order detail with the largest effect on the late-delivery score.",
+        ui_theme.render(ui_theme.side_title("Quick facts"))
+        ui_theme.render(
+            ui_theme.tiles(
+                [
+                    ui_theme.tile(
+                        "Order lines",
+                        "180,519",
+                        tip="Rows in the raw file. An order can have several lines.",
+                    ),
+                    ui_theme.tile(
+                        "Unique orders",
+                        "65,752",
+                        tip="Orders after combining their lines.",
+                    ),
+                    ui_theme.tile(
+                        "Late rate",
+                        "54.8%",
+                        tone="problem",
+                        tip="Share of orders delivered late.",
+                    ),
+                    ui_theme.tile(
+                        "Top signal",
+                        "Shipping mode",
+                        tip=(
+                            "The order detail with the largest effect on the "
+                            "late-delivery score."
+                        ),
+                    ),
+                ],
+                variant="small stack",
+            )
         )
 
         st.markdown("---")
-        st.markdown(
-            "<div style='font-size: 0.75rem; opacity: 0.5;'>"
-            "Built by Tirth Joshi<br>"
-            "<a href='https://github.com/tirthjoship/late-delivery-risk-prediction' "
-            "style='color: inherit;'>View on GitHub</a>"
-            "</div>",
-            unsafe_allow_html=True,
+        ui_theme.render(
+            "<div class='ld-side-foot'>Built by Tirth Joshi<br>"
+            "<a href='https://github.com/tirthjoship/late-delivery-risk-prediction'>"
+            "View on GitHub</a></div>"
         )
 
     # --- Load static data first (instant, no training) ---
     full_metrics = load_full_metrics()
     full_stats = load_full_stats()
 
-    # --- Hero (shows immediately while pipeline trains) ---
-    st.markdown(
-        "<h1 style='text-align: center; margin-bottom: 0;'>"
-        "Late Delivery Risk Prediction</h1>",
-        unsafe_allow_html=True,
-    )
-    st.markdown(
-        "<p style='text-align: center; opacity: 0.6; margin-top: -0.5rem; "
-        "margin-bottom: 1.2rem;'>"
-        "Predict, explain, compare, segment</p>",
-        unsafe_allow_html=True,
-    )
-
-    # --- Landing summary ---
-    with st.container(border=True):
-        st.subheader("The problem")
-        st.markdown(
-            "**More than half of orders (54.8%) arrive late.** Shipping mode is the "
-            "main reason: First Class orders are late 95.3% of the time and Second "
-            "Class orders 76.7% of the time, while Standard Class is late 38.1% of "
-            "the time."
-        )
-        st.subheader(
-            "What this app does",
-            help=(
-                "Model details: XGBoost trained on the 52,601 earliest orders and "
-                "tested on the 13,151 latest ones. At a 0.5 cutoff it scores F1 = "
-                "0.6648 (precision 0.7743, recall 0.5825). Shipping mode accounts for "
-                "about 73% of the total feature impact (mean absolute SHAP), "
-                "so the model largely re-learns a shipping-mode lookup. Experiments "
-                "were tracked with MLflow and the code follows a hexagonal "
-                "(ports and adapters) layout."
-            ),
-        )
-        st.markdown(
-            "It estimates the chance that an order will arrive late before it ships, "
-            "shows which order details pushed that estimate up or down, and groups "
-            "orders into segments. Logistics teams can use this to reroute, "
-            "prioritize, or warn customers early."
-        )
+    # --- Header (shows immediately while the pipeline trains) ---
+    ui_theme.render(_app_header(full_metrics, full_stats))
 
     # --- Technical notes expander ---
     with st.expander("How it works (technical notes)", expanded=False):
@@ -356,17 +331,15 @@ or the shipping date. Those are only known after shipment and would give away th
                 """
             )
 
-    st.markdown("---")
-
     # --- Train pipeline (shows animated loading while training) ---
     loading_placeholder = st.empty()
     with loading_placeholder.container():
         st.markdown(
             "<div style='text-align: center; padding: 3rem 0;'>"
-            "<h3 style='margin-bottom: 0.3rem;'>Preparing Dashboard</h3>"
-            "<p style='opacity: 0.6;'>Training XGBoost + LogReg on sample data "
-            "and computing explanations.<br>"
-            "<em>The first load takes about 10 seconds, then it is cached.</em></p>"
+            "<div class='ld-card-title'>Preparing the dashboard</div>"
+            "<p class='ld-takeaway'>Training XGBoost and logistic regression on "
+            "the sample data and computing explanations.<br>"
+            "The first load takes about 10 seconds, then it is cached.</p>"
             "</div>",
             unsafe_allow_html=True,
         )
@@ -405,12 +378,11 @@ or the shipping date. Those are only known after shipment and would give away th
 
     # --- Footer ---
     st.markdown("---")
-    st.markdown(
-        "<div style='text-align: center; opacity: 0.4; font-size: 0.78rem;'>"
+    ui_theme.render(
+        "<div class='ld-side-foot' style='text-align: center;'>"
         "Built with Streamlit, XGBoost and SHAP. "
-        "<a href='https://github.com/tirthjoship/late-delivery-risk-prediction' "
-        "style='color: inherit;'>GitHub</a></div>",
-        unsafe_allow_html=True,
+        "<a href='https://github.com/tirthjoship/late-delivery-risk-prediction'>"
+        "GitHub</a></div>"
     )
 
 

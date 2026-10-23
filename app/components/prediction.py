@@ -12,6 +12,7 @@ import streamlit as st
 from adapters.ml.shap_explainer import ShapExplainer
 from adapters.visualization.labels import feature_label
 from adapters.visualization.plotly_charts import risk_gauge, shap_waterfall
+from app.components import ui_theme
 from application.use_cases import PredictSingleOrderUseCase
 from domain.models import Order, OrderItem
 from domain.services import extract_features
@@ -57,25 +58,86 @@ def _build_order_from_form(
     )
 
 
+_ACT_BY_BAND = {
+    "High": "Reroute or warn the customer now",
+    "Medium": "Monitor and prepare a backup carrier",
+    "Low": "Proceed normally",
+}
+
+
+def _band(probability: float) -> str:
+    """Return High, Medium or Low using the same cutoffs as the gauge."""
+    if probability > 0.70:
+        return "High"
+    if probability > 0.40:
+        return "Medium"
+    return "Low"
+
+
+def _prompt_bottom_line() -> str:
+    """Neutral decision box shown before the first prediction."""
+    return ui_theme.bottom_line(
+        question="Will this order arrive late?",
+        answer="Enter an order and click Predict risk",
+        tone="neutral",
+        sentences=[
+            (
+                "Fill in the order details, then click Predict risk. The answer, "
+                "the reason and the suggested action appear here."
+            )
+        ],
+    )
+
+
+def _result_bottom_line(
+    probability: float, shipping_mode: str, days: int, top_factor: str, raises: bool
+) -> str:
+    """Decision box for one scored order."""
+    band = _band(probability)
+    direction = "pushes the risk up" if raises else "pushes the risk down"
+    return ui_theme.bottom_line(
+        question="Will this order arrive late?",
+        answer=f"{band} risk: {probability:.1%} chance of arriving late",
+        tone=ui_theme.tone_for_probability(probability),
+        sentences=[
+            (
+                f"For a {shipping_mode} order planned to ship in {days} "
+                f"{'day' if days == 1 else 'days'}, the model puts the chance of "
+                f"a late delivery at {probability:.1%}."
+            ),
+            f"The biggest single factor is {top_factor}, which {direction}.",
+        ],
+        act=_ACT_BY_BAND[band],
+        confidence="Indicative",
+        confidence_why=(
+            "Scores come from a model trained on a 1,000-order sample so they "
+            "update instantly. The reported accuracy is on the Model results tab."
+        ),
+        would_change="A different shipping mode or planned shipping time",
+    )
+
+
 def render_prediction_tab(pipeline: dict[str, Any]) -> None:
     """Render the Predict & Explain tab."""
-    st.header("Predict late delivery risk")
-    st.caption(
-        "Scores come from a model trained on a 1,000-order sample so they update "
-        "instantly. See the Model results tab for results on the full dataset.",
-        help=(
-            "The sample model shows how the predictor behaves. Its scores are not "
-            "the reported accuracy, which comes from the full 65,752-order dataset."
-        ),
-    )
+    bottom_slot = st.empty()
+    bottom_slot.markdown(_prompt_bottom_line(), unsafe_allow_html=True)
 
     region_options = sorted({o.order_region for o in pipeline["orders"]})
 
-    left_col, spacer, right_col = st.columns([4, 1, 6])
+    left_col, right_col = st.columns([4, 6], gap="large")
 
-    with left_col:
-        st.markdown("##### Order details")
-
+    with (
+        left_col,
+        ui_theme.card(
+            "Order details",
+            "Describe one order before it ships.",
+            tip=(
+                "Scores come from a model trained on a 1,000-order sample so they "
+                "update instantly. The reported accuracy comes from the full "
+                "65,752-order dataset."
+            ),
+        ),
+    ):
         shipping_mode = st.selectbox(
             "Shipping mode",
             options=["Standard Class", "First Class", "Second Class", "Same Day"],
@@ -136,7 +198,6 @@ def render_prediction_tab(pipeline: dict[str, Any]) -> None:
                 help="Profit on the whole order in dollars. Negative means a loss.",
             )
 
-        st.markdown("")
         predict_clicked = st.button(
             "Predict risk", type="primary", use_container_width=True
         )
@@ -164,70 +225,82 @@ def render_prediction_tab(pipeline: dict[str, Any]) -> None:
             )
             result = use_case.execute(order)
 
-            # Risk gauge
-            gauge_fig = risk_gauge(result.probability)
-            st.plotly_chart(gauge_fig, use_container_width=True)
-
-            # Risk label badge
-            outcome_help = (
-                "The box uses the same High, Medium and Low bands as the gauge. "
-                "The model itself flags an order as late at a 0.35 cutoff, which "
-                "is the operating point chosen to catch more late orders."
-            )
-            chance = f"{result.probability:.1%} chance of arriving late"
-            if result.probability > 0.70:
-                st.error(f"**High risk:** {chance}")
-            elif result.probability > 0.40:
-                st.warning(f"**Medium risk:** {chance}")
-            else:
-                st.success(f"**Low risk:** {chance}")
-            st.caption("How this box is chosen", help=outcome_help)
-
-            # SHAP waterfall
             local_result = explainer.explain_local(
                 encoder.transform([extract_features(order)]).values,
                 index=0,
             )
-            st.markdown(
-                "##### What drove this prediction?",
-                help=(
-                    "Each bar shows how much one order detail pushed the score "
-                    "toward late (right) or toward on-time (left), compared with "
-                    "the average order. The starting point for an average order "
-                    f"is {local_result.expected_value:.3f} (SHAP base value)."
-                ),
-            )
-            waterfall_fig = shap_waterfall(
-                local_result.shap_values, local_result.expected_value
-            )
-            st.plotly_chart(waterfall_fig, use_container_width=True)
-
-            # Top 3 contributing factors
             sorted_shap = sorted(
                 local_result.shap_values.items(),
                 key=lambda kv: abs(kv[1]),
                 reverse=True,
             )
-            st.markdown("##### Top contributing factors")
-            for feature, value in sorted_shap[:3]:
-                direction = "raises" if value > 0 else "lowers"
-                st.markdown(
-                    f"**{feature_label(feature)}** {direction} the late risk",
-                    help=f"SHAP value: {value:+.2f}",
-                )
-        else:
-            st.markdown("")
-            st.markdown("")
-            st.info(
-                "Fill in the order details on the left and click **Predict risk** "
-                "to get a risk score with an explanation."
+            top_name, top_value = sorted_shap[0]
+            bottom_slot.markdown(
+                _result_bottom_line(
+                    result.probability,
+                    shipping_mode,
+                    days,
+                    feature_label(top_name),
+                    top_value > 0,
+                ),
+                unsafe_allow_html=True,
             )
-            st.markdown("")
 
-            with st.expander("How to read the results", expanded=True):
+            outcome_help = (
+                "The bands are High above 70%, Medium from 40 to 70% and Low "
+                "below 40%. The model itself flags an order as late at a 0.35 "
+                "cutoff, which is the operating point chosen to catch more late "
+                "orders."
+            )
+            with ui_theme.card(
+                "Risk score",
+                f"{result.probability:.1%} chance of arriving late, in the "
+                f"{_band(result.probability).lower()} band.",
+                tip=outcome_help,
+            ):
+                st.plotly_chart(
+                    ui_theme.style_figure(risk_gauge(result.probability)),
+                    use_container_width=True,
+                )
+
+            with ui_theme.card(
+                "What drove this prediction?",
+                f"{feature_label(top_name)} had the largest push, "
+                f"{'toward late' if top_value > 0 else 'toward on-time'}.",
+                tip=(
+                    "Each bar shows how much one order detail pushed the score "
+                    "toward late (right) or toward on-time (left), compared with "
+                    "the average order. The starting point for an average order "
+                    f"is {local_result.expected_value:.3f} (SHAP base value)."
+                ),
+            ):
+                st.plotly_chart(
+                    ui_theme.style_figure(
+                        shap_waterfall(
+                            local_result.shap_values, local_result.expected_value
+                        )
+                    ),
+                    use_container_width=True,
+                )
+
+            with ui_theme.card(
+                "Top contributing factors",
+                "The three order details that moved this score the most.",
+            ):
+                for feature, value in sorted_shap[:3]:
+                    direction = "raises" if value > 0 else "lowers"
+                    st.markdown(
+                        f"**{feature_label(feature)}** {direction} the late risk",
+                        help=f"SHAP value: {value:+.2f}",
+                    )
+        else:
+            with ui_theme.card(
+                "How to read the results",
+                "A risk band, a gauge and the order details that drove the score.",
+            ):
                 st.markdown(
                     """
-**Risk gauge:**
+**Risk bands:**
 - :red[**High**] (above 70%): reroute the order or notify the customer
 - :orange[**Medium**] (40 to 70%): monitor closely
 - :green[**Low**] (below 40%): proceed normally
@@ -240,3 +313,20 @@ or toward on-time, compared with the average order.
 and watch the gauge jump. Shipping mode is the strongest signal.
                     """
                 )
+
+    with st.expander("How we know", expanded=False):
+        st.markdown(
+            """
+- **Model:** XGBoost trained on a 1,000-order sample, so scores update instantly.
+  The reported accuracy (F1 0.66) comes from the full dataset on the Model results tab.
+- **Test design:** the full-data results use a time-based split. The model learns
+  from earlier orders and is tested on later ones.
+- **Leakage protection:** the model never sees actual shipping days, delivery
+  status or the shipping date, because those are only known after shipment.
+- **Explanations:** SHAP shows how each order detail moved the score compared
+  with the average order.
+- **Caveats:** the input form fills a few fields with fixed defaults (for example
+  country and city), so treat scores as a guide to how the model behaves, not as a
+  forecast for a specific shipment.
+            """
+        )

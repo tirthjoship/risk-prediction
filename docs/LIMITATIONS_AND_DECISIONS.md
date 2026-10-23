@@ -89,20 +89,14 @@ SHAP confirms the model learned exactly this — the top features for XGBoost ar
 
 ## 7. What this project still proves
 
-Even though the model doesn't beat the rule, the work demonstrates exactly what regulated-sector and ML-engineering interviews probe for:
+Even though the model does not beat the rule, the work still shows:
 
 - **Leakage control** as a first-class concern, enforced in code and tests.
 - **Leakage-safe, temporally-validated** evaluation with the right metric (F1, not accuracy).
 - **Calibration awareness** (Brier documented; adapter available) and an explicitly chosen ops threshold (0.35), not a silent 0.5 default.
 - **Explainability** (global + local SHAP) used to *interrogate* the model, which is how the shipping-mode dominance was caught.
-- **Production scaffolding**: hexagonal architecture, MLflow tracking + registry, 156 tests at 93% coverage, CI, a live Streamlit dashboard.
+- **Production scaffolding**: hexagonal architecture, MLflow tracking + registry, 230 tests at 95% coverage, CI, a live Streamlit dashboard.
 - **The judgement to recommend the simpler tool** when the data says so.
-
----
-
-## 8. Interview talking point
-
-> *"I shipped a leakage-safe classifier with full MLOps scaffolding, then used SHAP to show that a 4-row shipping-mode rule already captures most of the signal — XGBoost only added ~0.01 F1. So I recommended a rule for the high-risk modes and reserved the model for the one ambiguous tier where it actually discriminates. The deliverable was the decision, not the model."*
 
 ---
 

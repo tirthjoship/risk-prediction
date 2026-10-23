@@ -72,7 +72,7 @@ from domain.services import extract_features
 
 plt.style.use("seaborn-v0_8-darkgrid")
 
-DATA_PATH = PROJECT_ROOT / "data" / "raw" / "DataCoSupplyChainDataset.csv"
+DATA_PATH = Path("..") / "data" / "raw" / "DataCoSupplyChainDataset.csv"  # relative to notebooks/
 print(f"Loading data from {DATA_PATH}")
 """
     )
@@ -658,13 +658,6 @@ cells.append(
 | Threshold | [Optimal value] | Update default | Cost reduction |
 | Error Analysis | [Worst segments] | [Promote/document] | Model limitations documented |
 | Feature V2 | [PIT lift] | [Promote/document] | Leakage quantified |
-
-### Interview One-Liners
-
-1. "Random split gave F1=X, temporal gave F1=Y - the gap reveals temporal distribution shift."
-2. "I moved threshold from 0.5 to [T] because missing a late delivery costs 3x more than a false alarm."
-3. "Point-in-time customer features lifted F1 by [X]. The naive version inflated by [Y] - that's data leakage."
-4. "The model struggles with [segment] - I documented this as a known limitation."
 """
     )
 )

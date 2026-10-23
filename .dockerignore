@@ -32,10 +32,8 @@ notebooks
 # Tests are not part of the runtime image
 tests
 
-# Local-only tooling and process docs (kitchen, not dining room)
-.claude
+# Local-only tooling and process docs
 .devcontainer
-docs/superpowers
 docs/IMPROVEMENT_PLAN.md
 docs/COMPLETION_CHECKLIST.md
 docs/PROJECT_DEEP_DIVE.md

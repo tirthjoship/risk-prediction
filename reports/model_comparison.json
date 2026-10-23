@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "purpose": "Frozen model comparison artifact for portfolio review. Every number traces to a saved training run.",
+    "purpose": "Frozen model comparison artifact for review. Every number traces to a saved training run.",
     "source_run": "data/metrics/full_run_metrics.json",
     "experiment_tracking": "mlflow.db (sqlite) — local only, gitignored",
     "dataset": "DataCo Smart Supply Chain — 180,519 order line items / 65,752 orders",

@@ -210,6 +210,13 @@ h1, h2, h3, h4, h5 {
 .ov-foot { font-size: 12px; color: var(--slate); margin: 10px 0 0; }
 [data-testid="stSelectbox"] label p { font-size: 12.5px; color: var(--slate); }
 
+.author-foot {
+  margin-top: 28px; padding-top: 12px; border-top: 1px solid var(--line);
+  font: 400 12px/1.6 'Inter', system-ui, sans-serif; color: var(--slate);
+}
+.author-foot a { color: var(--navy); text-decoration: none; border-bottom: 1px solid currentColor; }
+.author-foot a:hover { opacity: .8; }
+
 @media (max-width: 900px) {
   .ld-tiles.four { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .ov-head { min-height: 0; }
@@ -391,6 +398,17 @@ def style_figure(fig: go.Figure) -> go.Figure:
 def inject_css() -> None:
     """Inject fonts and the stylesheet once per run."""
     st.markdown(CSS, unsafe_allow_html=True)
+
+
+def author_footer(note: str = "") -> str:
+    """Slim author credit line for the bottom of the page (static strings only)."""
+    tail = f" · {note}" if note else ""
+    return (
+        '<div class="author-foot">Built by Tirth Joshi · '
+        '<a href="https://github.com/tirthjoship/risk-prediction" target="_blank" rel="noopener">Source code on GitHub</a> · '
+        '<a href="https://linkedin.com/in/tirthjoshi" target="_blank" rel="noopener">LinkedIn</a>'
+        f"{tail}</div>"
+    )
 
 
 def render(html: str) -> None:

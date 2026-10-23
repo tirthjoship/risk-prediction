@@ -72,7 +72,7 @@ Net value per 10,000 orders (`C_int` = $3 fixed):
 | **$15** | −$8,257 | **+$4,911** | +$18,079 |
 | **$25** | −$3,860 | +$18,079 | +$40,018 |
 
-**Break-even** (net value = 0) is `caught × C_late × r = flagged × C_int`, i.e. `C_late × r = 21,447 / 4,393 ≈ $4.88`. Below that the program loses money; above it, it pays. This break-even is the number to defend in an interview, not a fixed ROI.
+**Break-even** (net value = 0) is `caught × C_late × r = flagged × C_int`, i.e. `C_late × r = 21,447 / 4,393 ≈ $4.88`. Below that the program loses money; above it, it pays. This break-even is the number to defend, not a fixed ROI.
 
 ---
 
@@ -97,6 +97,6 @@ A **flag-all rule on First + Second Class** captures their late orders at higher
 
 - The model produces **modest, assumption-dependent** net value; it is not a slam-dunk ROI story, and the project does not pretend otherwise.
 - The **defensible recommendation** is a shipping-mode rule for the high-risk tiers plus a model on the ambiguous Standard Class tier — cheaper, transparent, and nearly as effective.
-- The portfolio value is the **decision discipline**: measuring lift honestly, pricing the cost asymmetry (ops threshold 0.35 vs pure cost-opt 0.05), and recommending the simpler tool when the data says so.
+- The value of this analysis is the **decision discipline**: measuring lift honestly, pricing the cost asymmetry (ops threshold 0.35 vs pure cost-opt 0.05), and recommending the simpler tool when the data says so.
 
 *See [`LIMITATIONS_AND_DECISIONS.md`](./LIMITATIONS_AND_DECISIONS.md) for the modelling rationale and [`reports/model_comparison.json`](../reports/model_comparison.json) for frozen metrics.*
